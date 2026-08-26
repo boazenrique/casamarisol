@@ -1,0 +1,27 @@
+<section class="secao-relacionados">
+  <h2 class="titulo-centralizado">Produtos Relacionados</h2>
+
+  <div class="carrossel-relacionados">
+    <button type="button" class="carrossel-seta anterior" id="relacionados-anterior" aria-label="Ver produtos anteriores">‹</button>
+
+    <div class="trilho-relacionados" id="trilho-relacionados">
+      <% relacionados.forEach(function(p) { %>
+        <% var off = Math.round((1 - p.precoPix / p.precoDe) * 100); %>
+        <a class="cartao-relacionado" href="/produto/<%= p.slug %>">
+          <div class="imagem-relacionado">
+            <img src="<%= p.imagens[0] %>" alt="<%= p.nome %>" />
+            <span class="selo-off-relacionado">-<%= off %>%</span>
+          </div>
+          <div class="info-relacionado">
+            <div class="nome-relacionado"><%= p.nome %></div>
+            <div class="avaliacao-relacionado">★★★★★ <span>(<%= p.avaliacoes %>)</span></div>
+            <div class="preco-de-relacionado"><%= p.precoDe.toLocaleString("pt-BR", {style:"currency", currency:"BRL"}) %></div>
+            <div class="preco-pix-relacionado"><%= p.precoPix.toLocaleString("pt-BR", {style:"currency", currency:"BRL"}) %> no Pix</div>
+          </div>
+        </a>
+      <% }) %>
+    </div>
+
+    <button type="button" class="carrossel-seta proxima" id="relacionados-proxima" aria-label="Ver mais produtos">›</button>
+  </div>
+</section>

@@ -1,0 +1,17 @@
+{
+  "name": "casa-marisol",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Loja Casa Marisol - pagina de produto, carrinho, checkout e pagamento Pix",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "ejs": "^3.1.10",
+    "express": "^4.19.2",
+    "qrcode": "^1.5.4"
+  }
+}

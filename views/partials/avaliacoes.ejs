@@ -1,0 +1,64 @@
+<section class="secao-avaliacoes">
+  <div class="cabecalho-avaliacoes">
+    <h2>Avaliação geral do produto</h2>
+    <button type="button" class="btn btn-outline" id="btn-fazer-avaliacao">☆ Fazer avaliação</button>
+  </div>
+
+  <div class="resumo-avaliacoes">
+    <div class="nota-grande">
+      <div class="numero"><%= produto.avaliacoesResumo.nota.toFixed(2) %>/5</div>
+      <div class="estrelas-grandes">★★★★★</div>
+      <div class="base">Baseado em <%= produto.avaliacoesResumo.total %> avaliações</div>
+    </div>
+
+    <div class="distribuicao-notas">
+      <div class="titulo-filtro">Filtrar por nota</div>
+      <div class="botoes-filtro" id="filtro-notas">
+        <% [5, 4, 3, 2, 1].forEach(function(n) { %>
+          <button type="button" class="filtro-nota" data-estrelas="<%= n %>">
+            ★ <%= n %> <span>(<%= produto.avaliacoesResumo.distribuicao[n] || 0 %>)</span>
+          </button>
+        <% }) %>
+      </div>
+    </div>
+  </div>
+
+  <% if (produto.fotosClientes && produto.fotosClientes.length) { %>
+    <div class="fotos-clientes">
+      <div class="titulo-fotos-clientes">Fotos de clientes</div>
+      <div class="grade-fotos-clientes">
+        <% produto.fotosClientes.forEach(function(foto, i) { %>
+          <button type="button" class="miniatura-foto-cliente" data-foto="<%= foto %>" aria-label="Ampliar foto <%= i + 1 %> de cliente">
+            <img src="<%= foto %>" alt="Foto enviada por cliente <%= i + 1 %>" loading="lazy" />
+          </button>
+        <% }) %>
+      </div>
+    </div>
+  <% } %>
+
+  <div class="lista-avaliacoes" id="lista-avaliacoes">
+    <% produto.avaliacoesLista.forEach(function(av) { %>
+      <div class="avaliacao-item" data-estrelas="<%= av.estrelas %>">
+        <div class="estrelas-item"><%= "★".repeat(av.estrelas) + "☆".repeat(5 - av.estrelas) %></div>
+        <div class="autor-avaliacao"><%= av.nome %></div>
+        <div class="meta-avaliacao">
+          <span><%= new Date(av.data + "T00:00:00").toLocaleDateString("pt-BR") %></span>
+          <span><%= av.cidade %></span>
+        </div>
+        <p class="comentario-avaliacao">"<%= av.comentario %>"</p>
+        <% if (av.recomenda) { %>
+          <span class="selo-recomenda">✓ Recomendo este produto</span>
+        <% } %>
+      </div>
+    <% }) %>
+  </div>
+
+  <p class="sem-avaliacoes-filtro" id="sem-avaliacoes-filtro">Nenhuma avaliação encontrada com essa nota.</p>
+
+  <% if (produto.fotosClientes && produto.fotosClientes.length) { %>
+    <div class="lightbox-foto" id="lightbox-foto">
+      <button type="button" class="lightbox-fechar" id="lightbox-fechar" aria-label="Fechar">×</button>
+      <img src="" alt="Foto de cliente ampliada" id="lightbox-imagem" />
+    </div>
+  <% } %>
+</section>

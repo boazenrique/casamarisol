@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="pt-BR">
+<head><%- include("partials/head", { titulo: "Checkout seguro" }) %></head>
+<body class="checkout-body">
+  <header class="checkout-topo">
+    <a href="/" aria-label="Voltar para Casa Marisol"><img src="/images/logo.png" alt="<%= loja.nome %>"></a>
+  </header>
+  <div class="checkout-beneficios">
+    <div class="checkout-beneficios-inner">
+      <span><i class="fa-solid fa-bolt"></i><b>5% de desconto</b><small>pagando com Pix</small></span>
+      <span><i class="fa-solid fa-truck-fast"></i><b>Frete grátis</b><small>para todo o Brasil</small></span>
+      <span><i class="fa-solid fa-bag-shopping"></i><b>Compra segura</b><small>seus dados protegidos</small></span>
+    </div>
+  </div>
+  <div class="checkout-aviso">Você ganhou <b>5% de desconto no Pix</b> + envio gratuito</div>
+
+  <main class="checkout-shell">
+    <form id="form-checkout" class="checkout-colunas">
+      <div class="checkout-fluxo">
+        <section class="checkout-card etapa ativa" data-step="1">
+          <header class="etapa-titulo"><span>1</span><div><h2>Identificação</h2><p>Usaremos seus dados para acompanhar e entregar o pedido.</p></div><i class="fa-solid fa-check etapa-check"></i></header>
+          <div class="etapa-conteudo">
+            <label for="nome">Nome completo</label><input id="nome" name="nome" autocomplete="name" placeholder="Ex.: Maria de Almeida Cruz" required>
+            <label for="email">E-mail <small>(para envio do rastreio)</small></label><input type="email" id="email" name="email" autocomplete="email" placeholder="maria@gmail.com" required>
+            <div class="checkout-duplo"><div><label for="cpf">CPF</label><input id="cpf" name="cpf" inputmode="numeric" placeholder="000.000.000-00" required></div><div><label for="telefone">Celular / WhatsApp</label><input type="tel" id="telefone" name="telefone" autocomplete="tel" inputmode="numeric" placeholder="(00) 00000-0000" required></div></div>
+            <div class="desconto-pix"><i class="fa-brands fa-pix"></i> Você ganhou <strong>5% de desconto</strong> pagando com Pix</div>
+            <button type="button" class="btn btn-primario btn-bloco btn-proxima" data-next="2">Ir para entrega <i class="fa-solid fa-arrow-right"></i></button>
+          </div>
+        </section>
+
+        <section class="checkout-card etapa bloqueada" data-step="2">
+          <header class="etapa-titulo"><span>2</span><div><h2>Entrega</h2><p>Preencha o endereço onde deseja receber.</p></div><i class="fa-solid fa-check etapa-check"></i></header>
+          <div class="etapa-conteudo">
+            <div class="checkout-duplo endereco-primeira"><div><label for="cep">CEP</label><div class="campo-cep"><input id="cep" name="cep" autocomplete="postal-code" inputmode="numeric" placeholder="00000-000" required><i class="fa-solid fa-location-dot"></i></div><small class="cep-status" id="cep-status" aria-live="polite"></small></div><div><label for="uf">Estado</label><input id="uf" name="uf" autocomplete="address-level1" maxlength="2" placeholder="SP" required></div></div>
+            <label for="rua">Endereço</label><input id="rua" name="rua" autocomplete="street-address" placeholder="Rua, avenida..." required>
+            <div class="checkout-duplo"><div><label for="numero">Número</label><input id="numero" name="numero" required></div><div><label for="complemento">Complemento</label><input id="complemento" name="complemento" placeholder="Opcional"></div></div>
+            <div class="checkout-duplo"><div><label for="bairro">Bairro</label><input id="bairro" name="bairro" required></div><div><label for="cidade">Cidade</label><input id="cidade" name="cidade" autocomplete="address-level2" required></div></div>
+            <div class="opcao-frete"><i class="fa-solid fa-truck"></i><span><strong>Entrega grátis</strong><small>Receba com código de rastreio</small></span><b>R$ 0,00</b></div>
+            <button type="button" class="btn btn-primario btn-bloco btn-proxima" data-next="3">Ir para pagamento <i class="fa-solid fa-arrow-right"></i></button>
+          </div>
+        </section>
+
+        <section class="checkout-card etapa bloqueada etapa-pagamento" data-step="3">
+          <header class="etapa-titulo"><span>3</span><div><h2>Pagamento</h2><p>Escolha como deseja finalizar.</p></div></header>
+          <div class="etapa-conteudo">
+            <label class="opcao-pagamento"><input type="radio" name="metodoPagamento" value="pix" checked><span class="pix-simbolo"><i class="fa-brands fa-pix"></i></span><span class="pagamento-descricao"><strong>Pix</strong><small>Aprovação rápida e 5% de desconto</small></span><i class="fa-solid fa-circle-check"></i></label>
+            <div class="pix-explicacao"><b>Como funciona?</b><span>Após confirmar, o QR Code e o Pix Copia e Cola aparecem nesta mesma página.</span></div>
+            <p class="erro-form" id="erro-form" role="alert"></p>
+            <button type="submit" class="btn btn-primario btn-bloco btn-finalizar" id="btn-finalizar"><i class="fa-solid fa-lock"></i> Finalizar compra</button>
+            <p class="checkout-termos">Compra protegida. Seus dados são usados somente para processar e entregar o pedido.</p>
+          </div>
+        </section>
+      </div>
+
+      <aside class="checkout-lateral">
+        <section class="checkout-card resumo-pedido resumo-novo">
+          <h2>Resumo</h2>
+          <div class="cupom"><label for="cupom">Tem um cupom?</label><div><input id="cupom" placeholder="Código do cupom"><button type="button">Adicionar</button></div></div>
+          <div id="resumo-itens" class="resumo-produtos"></div>
+          <div class="resumo-valores"><div><span>Produtos</span><span id="resumo-subtotal">R$ 0,00</span></div><div><span>Frete</span><strong>Grátis</strong></div><div class="resumo-total"><span>Total</span><strong id="resumo-total-valor">R$ 0,00</strong></div><small>em até 12x no cartão</small></div>
+        </section>
+        <section class="checkout-card garantias">
+          <div><i class="fa-solid fa-store"></i><span><b>Casa Marisol</b><small>Produtos escolhidos com carinho para deixar sua casa ainda melhor.</small></span></div>
+          <div><i class="fa-solid fa-shield-halved"></i><span><b>Pagamento 100% seguro</b><small>Ambiente protegido durante toda a compra.</small></span></div>
+          <div><i class="fa-solid fa-rotate-left"></i><span><b>7 dias para devolução</b><small>Compre com tranquilidade e suporte.</small></span></div>
+          <div><i class="fa-solid fa-truck-fast"></i><span><b>Frete grátis com rastreio</b><small>Acompanhe seu pedido até a entrega.</small></span></div>
+        </section>
+      </aside>
+    </form>
+
+    <section class="checkout-pix" id="checkout-pix" hidden aria-live="polite">
+      <div class="pix-sucesso-icone"><i class="fa-solid fa-check"></i></div><span class="checkout-eyebrow">Pedido criado com sucesso</span><h2>Agora é só pagar com Pix</h2><p>Pedido <strong id="pix-pedido-id"></strong></p>
+      <div class="pix-layout"><div class="qr-box"><img id="pix-qr-code" alt="QR Code para pagamento Pix"></div><div class="pix-instrucoes"><div class="valor-pagar" id="pix-valor"></div><ol><li>Abra o aplicativo do seu banco.</li><li>Escolha Pix e escaneie o QR Code.</li><li>Confira o valor e confirme.</li></ol><label for="pix-copia-cola">Pix Copia e Cola</label><div class="copia-cola"><input id="pix-copia-cola" readonly><button type="button" class="btn btn-secundario" id="btn-copiar-pix">Copiar</button></div><div class="status-pagamento pendente" id="status-pagamento"><span class="status-pulso"></span> Aguardando pagamento</div><button type="button" class="btn btn-outline btn-bloco" id="btn-simular" hidden>Simular pagamento (teste)</button></div></div>
+    </section>
+  </main>
+  <footer class="checkout-footer"><i class="fa-solid fa-lock"></i> Ambiente seguro · Casa Marisol</footer>
+  <script src="/js/cart.js"></script><script src="/js/checkout.js"></script>
+</body></html>

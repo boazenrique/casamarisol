@@ -1,0 +1,67 @@
+<section class="faixa-servicos">
+  <div class="container">
+    <div class="item-servico">
+      <span class="icone-servico">🕒</span>
+      <div class="titulo-servico">Atendimento</div>
+      <!-- TODO: substituir pelo horário real de atendimento da Casa Marisol -->
+      <div class="texto-servico">Segunda a Sábado, das 9h às 18h</div>
+    </div>
+    <div class="item-servico">
+      <span class="icone-servico">📦</span>
+      <div class="titulo-servico">Trocas e devoluções</div>
+      <div class="texto-servico">Até 7 dias para arrependimento, conforme o Código de Defesa do Consumidor</div>
+    </div>
+    <div class="item-servico">
+      <span class="icone-servico">🚚</span>
+      <div class="titulo-servico">Frete</div>
+      <div class="texto-servico">Enviamos para todo o Brasil</div>
+    </div>
+    <div class="item-servico">
+      <span class="icone-servico">🔑</span>
+      <div class="titulo-servico">Pagamento</div>
+      <div class="texto-servico">Somente Pix, com confirmação automática</div>
+    </div>
+  </div>
+</section>
+
+<footer class="rodape">
+  <div class="container">
+    <div>
+      <a class="logo-rodape" href="/" aria-label="Página inicial da <%= loja.nome %>">
+        <img src="/images/logo-transparent.png" alt="<%= loja.nome %>" />
+      </a>
+      <p><%= loja.tagline %></p>
+    </div>
+    <div>
+      <h3>Institucional</h3>
+      <ul class="lista-links">
+        <li><a href="#">Como Comprar</a></li>
+        <li><a href="#">Trocas e Devoluções</a></li>
+        <li><a href="#">Política de Privacidade</a></li>
+        <li><a href="/carrinho">Meu Carrinho</a></li>
+      </ul>
+    </div>
+    <div>
+      <h3>Formas de pagamento</h3>
+      <p>Pix com confirmação automática</p>
+      <img class="logo-pix-rodape" src="/images/pix.png" alt="Pix" />
+    </div>
+    <div class="seguranca-privacidade">
+      <h3>Segurança e Privacidade</h3>
+      <div class="selos-seguranca">
+        <img src="/images/ver01.png" alt="Selo de segurança" />
+        <img src="/images/ver02.png" alt="Selo de privacidade" />
+      </div>
+    </div>
+    <div>
+      <h3>Atendimento</h3>
+      <p><a href="mailto:casasmarisol@contato.com">casasmarisol@contato.com</a></p>
+      <p>(37) 9 3899-9876</p>
+    </div>
+  </div>
+  <p class="copyright">&copy; <%= new Date().getFullYear() %> <%= loja.nome %>. Todos os direitos reservados.</p>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script src="/js/cart.js"></script>

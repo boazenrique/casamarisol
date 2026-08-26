@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <%- include("partials/head", { titulo: produto.nome }) %>
+</head>
+<body data-produto-id="<%= produto.id %>">
+  <%- include("partials/header") %>
+
+  <main class="container">
+    <nav class="breadcrumb">
+      <a href="/">Home</a> ›
+      <% produto.categoria.forEach(function(c) { %> <%= c %> › <% }) %>
+      <span><%= produto.nome %></span>
+    </nav>
+
+    <section class="pagina-produto">
+      <div class="galeria">
+        <div class="imagem-principal">
+          <img id="imagem-principal" src="<%= produto.imagens[0] %>" alt="<%= produto.nome %>" />
+          <% if (produto.video) { %>
+            <video id="video-principal" controls playsinline preload="metadata" aria-label="Vídeo do produto <%= produto.nome %>"></video>
+          <% } %>
+          <% if (produto.imagens.length > 1 || produto.video) { %>
+            <button type="button" class="galeria-seta anterior" id="seta-anterior" aria-label="Foto anterior">‹</button>
+            <button type="button" class="galeria-seta proxima" id="seta-proxima" aria-label="Próxima foto">›</button>
+          <% } %>
+        </div>
+        <div class="miniaturas" id="miniaturas">
+          <% produto.imagens.forEach(function(img, i) { %>
+            <button type="button" class="<%= i === 0 ? 'ativa' : '' %>" data-src="<%= img %>" data-tipo="imagem">
+              <img src="<%= img %>" alt="<%= produto.nome %> - foto <%= i + 1 %>" />
+            </button>
+          <% }) %>
+          <% if (produto.video) { %>
+            <button type="button" class="miniatura-video" data-src="<%= produto.video %>" data-tipo="video" aria-label="Reproduzir vídeo do produto">
+              <video src="<%= produto.video %>" muted preload="metadata"></video>
+              <span aria-hidden="true">&#9654;</span>
+            </button>
+          <% } %>
+        </div>
+      </div>
+
+      <div class="info-produto">
+        <div class="marca">Marca: <%= produto.marca %></div>
+        <h1><%= produto.nome %></h1>
+
+        <div class="avaliacao">
+          <span class="estrelas">★★★★★</span>
+          <span class="nota-numero"><%= produto.nota %></span>
+          <span>(<%= produto.avaliacoes %> avaliações)</span>
+        </div>
+
+        <div class="bloco-preco">
+          <div class="preco-de">De <%= produto.precoDe.toLocaleString("pt-BR", {style:"currency", currency:"BRL"}) %></div>
+          <div class="preco-pix">
+            <span class="valor"><%= produto.precoPix.toLocaleString("pt-BR", {style:"currency", currency:"BRL"}) %></span>
+            <span class="rotulo-pix">no Pix</span>
+            <span class="selo-off">🏷️ <%= Math.round((1 - produto.precoPix / produto.precoDe) * 100) %>% OFF</span>
+          </div>
+          <div class="pix-envio-caixa">
+            <img src="/images/pix.png" alt="Pix" class="pix-envio-icone" />
+            <div class="pix-envio-texto">
+              <strong>5% OFF</strong> <span>no pix</span>
+            </div>
+            <div class="pix-envio-badge">+ Envio Prioritário</div>
+          </div>
+        </div>
+
+        <div class="selecao-qtd">
+          <div class="stepper">
+            <button type="button" id="btn-menos" aria-label="Diminuir quantidade">−</button>
+            <input type="number" id="input-qtd" value="1" min="1" max="<%= produto.estoque %>" />
+            <button type="button" id="btn-mais" aria-label="Aumentar quantidade">+</button>
+          </div>
+          <span class="estoque-info disponivel" id="estoque-info"><%= produto.estoque %> em estoque</span>
+        </div>
+
+        <div class="acoes-produto">
+          <button type="button" class="btn btn-primario btn-bloco" id="btn-comprar">Comprar agora</button>
+        </div>
+
+        <div class="calculo-frete">
+          <div class="rotulo">Calcule o frete e o prazo de entrega</div>
+          <form id="form-frete" autocomplete="off">
+            <input type="text" id="input-cep" inputmode="numeric" placeholder="Digite seu CEP" maxlength="9" />
+            <button type="submit">OK</button>
+          </form>
+          <div class="resultado-frete" id="resultado-frete"></div>
+        </div>
+
+        <div class="cartao-frete">
+          <img src="/images/correios.png" alt="Correios" class="icone-frete" />
+          <div class="texto-cartao-frete">
+            <div class="titulo-cartao-frete">Frete Grátis para todo o Brasil</div>
+            <div class="subtitulo-cartao-frete">Envio Imediato!</div>
+          </div>
+        </div>
+
+        <div class="selos-confianca">
+          <span>🔒 Compra segura</span>
+          <span>💳 Pagamento protegido</span>
+          <span>📦 Envio para todo o Brasil</span>
+        </div>
+      </div>
+    </section>
+
+    <% if (produto.descricao || produto.beneficios || produto.caracteristicas || produto.itensInclusos || (produto.especificacoes && produto.especificacoes.length) || produto.indicacoes || produto.perguntasFrequentes || produto.garantia || produto.cuidados) { %>
+      <section class="abas-produto">
+        <% if (produto.descricao) { %>
+          <h2>Descrição do produto</h2>
+          <ul>
+            <% produto.descricao.forEach(function(linha) { %>
+              <li><%= linha %></li>
+            <% }) %>
+          </ul>
+        <% } %>
+
+        <% if (produto.caracteristicas && produto.caracteristicas.length) { %>
+          <h2>Características gerais</h2>
+          <ul>
+            <% produto.caracteristicas.forEach(function(caracteristica) { %>
+              <li><%= caracteristica %></li>
+            <% }) %>
+          </ul>
+        <% } %>
+
+        <% if (produto.beneficios && produto.beneficios.length) { %>
+          <h2>Benefícios principais</h2>
+          <ul>
+            <% produto.beneficios.forEach(function(beneficio) { %>
+              <li><%= beneficio %></li>
+            <% }) %>
+          </ul>
+        <% } %>
+
+        <% if (produto.itensInclusos && produto.itensInclusos.length) { %>
+          <h3>Itens inclusos</h3>
+          <ul>
+            <% produto.itensInclusos.forEach(function(item) { %>
+              <li><%= item %></li>
+            <% }) %>
+          </ul>
+        <% } %>
+
+        <% if (produto.especificacoes && produto.especificacoes.length) { %>
+          <h2>Características</h2>
+          <table class="tabela-especificacoes">
+            <% produto.especificacoes.forEach(function(esp) { %>
+              <tr><td><%= esp.chave %></td><td><%= esp.valor %></td></tr>
+            <% }) %>
+          </table>
+        <% } %>
+
+        <% if (produto.indicacoes && produto.indicacoes.length) { %>
+          <h2>Indicações de uso</h2>
+          <ul>
+            <% produto.indicacoes.forEach(function(indicacao) { %>
+              <li><%= indicacao %></li>
+            <% }) %>
+          </ul>
+        <% } %>
+
+        <% if (produto.perguntasFrequentes && produto.perguntasFrequentes.length) { %>
+          <h2>Perguntas frequentes</h2>
+          <div class="perguntas-produto">
+            <% produto.perguntasFrequentes.forEach(function(item) { %>
+              <p><strong><%= item.pergunta %></strong><br /><%= item.resposta %></p>
+            <% }) %>
+          </div>
+        <% } %>
+
+        <% if (produto.garantia) { %>
+          <h2>Garantia</h2>
+          <p><%= produto.garantia %></p>
+        <% } %>
+
+        <% if (produto.cuidados) { %>
+          <h2>Cuidados e conservação</h2>
+          <p><%= produto.cuidados %></p>
+        <% } %>
+
+        <% if (produto.atencao) { %>
+          <div class="aviso-cuidado">
+            <strong>Atenção:</strong> <%= produto.atencao %>
+          </div>
+        <% } %>
+      </section>
+    <% } %>
+
+    <% if (produto.avaliacoesResumo) { %>
+      <%- include("partials/avaliacoes", { produto: produto }) %>
+    <% } %>
+
+    <% if (relacionados && relacionados.length) { %>
+      <%- include("partials/relacionados", { relacionados: relacionados }) %>
+    <% } %>
+  </main>
+
+  <%- include("partials/footer") %>
+
+  <script>
+    window.__PRODUTO__ = <%- JSON.stringify({
+      id: produto.id,
+      nome: produto.nome,
+      imagem: produto.imagens[0],
+      precoPix: produto.precoPix,
+      estoque: produto.estoque,
+    }) %>;
+    window.__LOJA__ = <%- JSON.stringify({ freteGratisAcima: loja.freteGratisAcima }) %>;
+  </script>
+  <script src="/js/produto.js"></script>
+</body>
+</html>

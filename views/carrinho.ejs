@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <%- include("partials/head", { titulo: "Meu Carrinho" }) %>
+</head>
+<body>
+  <%- include("partials/header") %>
+
+  <main class="container">
+    <nav class="breadcrumb"><a href="/">Home</a> › <span>Carrinho</span></nav>
+
+    <section class="pagina-carrinho">
+      <h1>Meu carrinho</h1>
+      <div id="lista-carrinho"></div>
+      <div id="carrinho-vazio" class="carrinho-vazio" style="display:none;">
+        <p>Seu carrinho está vazio.</p>
+        <a href="/" class="btn btn-secundario">Ver produtos</a>
+      </div>
+      <div id="resumo" class="resumo-carrinho" style="display:none;">
+        <div class="total">Total: <span id="total-carrinho">R$ 0,00</span></div>
+        <a href="/checkout" class="btn btn-primario">Ir para o checkout</a>
+      </div>
+    </section>
+  </main>
+
+  <%- include("partials/footer") %>
+  <script src="/js/carrinho-pagina.js"></script>
+</body>
+</html>

@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <%- include("partials/head") %>
+</head>
+<body>
+  <%- include("partials/header") %>
+
+  <section class="carrossel-home" aria-label="Destaques da loja" aria-roledescription="carrossel">
+    <div class="trilho-banner">
+      <div class="slide-banner ativo" aria-hidden="false">
+        <img src="/images/banner01.png" alt="Destaque Casa Marisol" />
+      </div>
+      <div class="slide-banner" aria-hidden="true">
+        <img src="/images/banner02.png" alt="Ofertas Casa Marisol" />
+      </div>
+    </div>
+
+    <button class="controle-banner anterior" type="button" aria-label="Banner anterior">&#10094;</button>
+    <button class="controle-banner proximo" type="button" aria-label="Próximo banner">&#10095;</button>
+
+    <div class="indicadores-banner" aria-label="Selecionar banner">
+      <button class="ativo" type="button" aria-label="Mostrar banner 1" aria-current="true"></button>
+      <button type="button" aria-label="Mostrar banner 2" aria-current="false"></button>
+    </div>
+  </section>
+
+  <main class="container">
+    <div class="grade-produtos">
+      <% produtos.forEach(function(p) { %>
+        <a class="cartao-produto" href="/produto/<%= p.slug %>">
+          <img src="<%= p.imagens[0] %>" alt="<%= p.nome %>" />
+          <div class="info">
+            <div class="marca"><%= p.marca %></div>
+            <div class="nome"><%= p.nome %></div>
+            <div class="preco-de-cartao"><%= p.precoDe.toLocaleString("pt-BR", {style:"currency", currency:"BRL"}) %></div>
+            <div class="preco-por"><%= p.precoPix.toLocaleString("pt-BR", {style:"currency", currency:"BRL"}) %></div>
+          </div>
+        </a>
+      <% }) %>
+    </div>
+  </main>
+
+  <%- include("partials/footer") %>
+  <script src="/js/home-carousel.js"></script>
+</body>
+</html>

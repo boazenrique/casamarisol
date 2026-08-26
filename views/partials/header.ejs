@@ -1,0 +1,43 @@
+<div class="topo-aviso">Frete grátis para todo o Brasil!</div>
+
+<header class="cabecalho">
+  <div class="container">
+    <a href="/" class="logo">
+      <img src="/images/logo.png" alt="<%= loja.nome %>" />
+    </a>
+
+    <form class="busca" action="/" method="get">
+      <input type="search" name="busca" placeholder="Buscar produtos..." />
+      <button type="submit" aria-label="Buscar">🔍</button>
+    </form>
+
+    <div class="acoes-cabecalho">
+      <button type="button" class="icone-acao btn-usuario" aria-label="Entrar ou criar uma conta" title="Entrar ou criar uma conta">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+          <circle cx="12" cy="7" r="4"></circle>
+        </svg>
+      </button>
+      <button type="button" class="icone-acao btn-favorito" id="btn-favoritos" aria-label="Favoritar">
+        <i class="fa-regular fa-heart"></i>
+      </button>
+      <a href="/carrinho" class="icone-acao icone-carrinho" aria-label="Carrinho">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <path d="M16 10a4 4 0 0 1-8 0"></path>
+        </svg>
+        <span class="badge-contagem" id="contagem-carrinho">0</span>
+      </a>
+    </div>
+  </div>
+
+  <nav class="faixa-categorias">
+    <div class="container">
+      <a href="/">Personalizados</a>
+      <a href="/">Organizadores de Geladeira</a>
+      <a href="/">Cozinha</a>
+      <a href="/">Casa</a>
+    </div>
+  </nav>
+</header>

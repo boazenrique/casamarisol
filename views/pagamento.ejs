@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <%- include("partials/head", { titulo: "Pagamento Pix" }) %>
+</head>
+<body>
+  <%- include("partials/header") %>
+
+  <main class="container">
+    <section class="pagina-pagamento">
+      <% if (pedido.pagamento.ambiente === "teste") { %>
+        <div class="selo-ambiente-teste">
+          ⚠️ <strong>Ambiente de teste.</strong> Este QR Code é gerado pelo provedor Pix "mock" para fins de
+          demonstração e não movimenta dinheiro real. Configure um gateway real (Mercado Pago, Efí, etc.) em
+          <code>.env</code> quando tiver as credenciais.
+        </div>
+      <% } %>
+
+      <h1>Pague com Pix para confirmar seu pedido</h1>
+      <p>Pedido <strong><%= pedido.id %></strong></p>
+
+      <div class="qr-box">
+        <img src="<%= pedido.pagamento.qrCodeDataUrl %>" alt="QR Code Pix" />
+      </div>
+
+      <div class="valor-pagar"><%= pedido.total.toLocaleString("pt-BR", {style:"currency", currency:"BRL"}) %></div>
+
+      <div class="copia-cola">
+        <input type="text" id="copia-cola" readonly value="<%= pedido.pagamento.copiaECola %>" />
+        <button type="button" class="btn btn-secundario" id="btn-copiar">Copiar código</button>
+      </div>
+
+      <div class="passos-pix">
+        <strong>Como pagar:</strong>
+        <ol>
+          <li>Abra o app do seu banco e escolha pagar via Pix.</li>
+          <li>Escaneie o QR Code acima ou cole o código copia-e-cola.</li>
+          <li>Confirme o valor e finalize o pagamento.</li>
+          <li>A confirmação aparece automaticamente nesta página.</li>
+        </ol>
+      </div>
+
+      <div class="status-pagamento pendente" id="status-pagamento">Aguardando pagamento...</div>
+
+      <% if (pedido.pagamento.ambiente === "teste") { %>
+        <button type="button" class="btn btn-outline btn-bloco" id="btn-simular">
+          Simular confirmação de pagamento (teste)
+        </button>
+      <% } %>
+    </section>
+  </main>
+
+  <%- include("partials/footer") %>
+
+  <script>
+    window.__PEDIDO__ = { id: "<%= pedido.id %>", status: "<%= pedido.status %>" };
+  </script>
+  <script src="/js/pagamento.js"></script>
+</body>
+</html>
