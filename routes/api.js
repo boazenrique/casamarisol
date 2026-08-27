@@ -85,7 +85,16 @@ router.post("/pedidos", async (req, res) => {
       pagamento,
     };
 
-    orderStore.create(pedido);
+    try {
+      // Cache local opcional (não disponível em hospedagens serverless
+      // como a Vercel, cujo sistema de arquivos é somente leitura). O
+      // status do pagamento sempre pode ser reconsultado na ZuckPay
+      // pelo external_id_client, então isso não é essencial.
+      orderStore.create(pedido);
+    } catch (err) {
+      console.warn("Aviso: não foi possível salvar o pedido localmente:", err.message);
+    }
+
     res.status(201).json({
       id: pedido.id,
       status: pedido.status,
@@ -108,24 +117,34 @@ router.post("/pedidos", async (req, res) => {
 });
 
 router.get("/pedidos/:id/status", async (req, res) => {
-  const pedido = orderStore.findById(req.params.id);
-  if (!pedido) return res.status(404).json({ erro: "Pedido não encontrado." });
-
-  if (pedido.status === "pendente") {
-    try {
-      const provider = getPixProvider();
-      if (typeof provider.getStatus === "function") {
-        const statusRemoto = await provider.getStatus(pedido.pagamento.providerChargeId);
-        if (statusRemoto && statusRemoto !== pedido.status) {
-          orderStore.update(pedido.id, { status: statusRemoto });
-          return res.json({ status: statusRemoto });
-        }
-      }
-    } catch (err) {
-      console.error("Erro ao consultar status remoto do Pix:", err);
-    }
+  let pedido = null;
+  try {
+    pedido = orderStore.findById(req.params.id);
+  } catch (_) {
+    // sem cache local disponível (ex.: Vercel) — segue direto pra ZuckPay.
   }
 
+  try {
+    const provider = getPixProvider();
+    if (typeof provider.getStatus === "function") {
+      const statusRemoto = await provider.getStatus({
+        transactionId: pedido?.pagamento?.providerChargeId,
+        externalId: req.params.id,
+      });
+      if (statusRemoto) {
+        if (pedido && pedido.status !== statusRemoto) {
+          try {
+            orderStore.update(pedido.id, { status: statusRemoto });
+          } catch (_) {}
+        }
+        return res.json({ status: statusRemoto });
+      }
+    }
+  } catch (err) {
+    console.error("Erro ao consultar status remoto do Pix:", err);
+  }
+
+  if (!pedido) return res.status(404).json({ erro: "Pedido não encontrado." });
   res.json({ status: pedido.status });
 });
 
@@ -152,10 +171,15 @@ router.post("/webhooks/pix", express.json(), (req, res) => {
   const status = transacao.status;
 
   if (pedidoId && status === "PAID") {
-    const pedido = orderStore.findById(pedidoId);
-    if (pedido && pedido.status !== "pago") {
-      orderStore.update(pedido.id, { status: "pago" });
-    }
+    // Best-effort: sem cache local disponível (ex.: Vercel), a confirmação
+    // real acontece via GET /api/pedidos/:id/status, que consulta a ZuckPay
+    // diretamente pelo external_id_client.
+    try {
+      const pedido = orderStore.findById(pedidoId);
+      if (pedido && pedido.status !== "pago") {
+        orderStore.update(pedido.id, { status: "pago" });
+      }
+    } catch (_) {}
   }
 
   res.sendStatus(200);
