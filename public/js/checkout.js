@@ -87,15 +87,14 @@
     if (status !== "pago") return;
     const el = document.getElementById("status-pagamento");
     el.innerHTML = '<i class="fa-solid fa-circle-check"></i> Pagamento confirmado! Estamos preparando seu pedido.';
-    el.className = "status-pagamento pago"; clearInterval(timer); document.getElementById("btn-simular").hidden = true;
+    el.className = "status-pagamento pago"; clearInterval(timer);
   }
   function showPix(data) {
-    document.querySelector(".checkout-colunas").hidden = true;
     document.getElementById("pix-pedido-id").textContent = data.id; document.getElementById("pix-qr-code").src = data.pagamento.qrCodeDataUrl;
     document.getElementById("pix-copia-cola").value = data.pagamento.copiaECola; document.getElementById("pix-valor").textContent = cart.formatarMoeda(data.total);
-    const section = document.getElementById("checkout-pix"); section.hidden = false; section.scrollIntoView({ behavior: "smooth", block: "start" });
-    const simulate = document.getElementById("btn-simular");
-    if (data.pagamento.ambiente === "teste") { simulate.hidden = false; simulate.onclick = async () => { simulate.disabled = true; const response = await fetch(`/api/pedidos/${encodeURIComponent(data.id)}/simular-pagamento`, { method: "POST" }); if (response.ok) paid((await response.json()).status); else simulate.disabled = false; }; }
+    document.querySelector(".checkout-colunas").setAttribute("inert", "");
+    document.getElementById("checkout-pix").hidden = false;
+    document.body.style.overflow = "hidden";
     timer = setInterval(async () => { try { const response = await fetch(`/api/pedidos/${encodeURIComponent(data.id)}/status`); if (response.ok) paid((await response.json()).status); } catch (_) {} }, 4000);
   }
   document.getElementById("btn-copiar-pix").onclick = async (event) => { const field = document.getElementById("pix-copia-cola"); try { await navigator.clipboard.writeText(field.value); } catch (_) { field.select(); document.execCommand("copy"); } event.currentTarget.textContent = "Copiado!"; setTimeout(() => event.currentTarget.textContent = "Copiar", 1800); };

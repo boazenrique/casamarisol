@@ -68,10 +68,12 @@
       </aside>
     </form>
 
-    <section class="checkout-pix" id="checkout-pix" hidden aria-live="polite">
-      <div class="pix-sucesso-icone"><i class="fa-solid fa-check"></i></div><span class="checkout-eyebrow">Pedido criado com sucesso</span><h2>Agora é só pagar com Pix</h2><p>Pedido <strong id="pix-pedido-id"></strong></p>
-      <div class="pix-layout"><div class="qr-box"><img id="pix-qr-code" alt="QR Code para pagamento Pix"></div><div class="pix-instrucoes"><div class="valor-pagar" id="pix-valor"></div><ol><li>Abra o aplicativo do seu banco.</li><li>Escolha Pix e escaneie o QR Code.</li><li>Confira o valor e confirme.</li></ol><label for="pix-copia-cola">Pix Copia e Cola</label><div class="copia-cola"><input id="pix-copia-cola" readonly><button type="button" class="btn btn-secundario" id="btn-copiar-pix">Copiar</button></div><div class="status-pagamento pendente" id="status-pagamento"><span class="status-pulso"></span> Aguardando pagamento</div><button type="button" class="btn btn-outline btn-bloco" id="btn-simular" hidden>Simular pagamento (teste)</button></div></div>
-    </section>
+    <div class="pix-modal-backdrop" id="checkout-pix" hidden>
+      <section class="checkout-pix" aria-live="polite" role="dialog" aria-modal="true" aria-label="Pagamento Pix">
+        <div class="pix-sucesso-icone"><i class="fa-solid fa-check"></i></div><span class="checkout-eyebrow">Pedido criado com sucesso</span><h2>Agora é só pagar com Pix</h2><p>Pedido <strong id="pix-pedido-id"></strong></p>
+        <div class="pix-layout"><div class="qr-box"><img id="pix-qr-code" alt="QR Code para pagamento Pix"></div><div class="pix-instrucoes"><div class="valor-pagar" id="pix-valor"></div><ol><li>Abra o aplicativo do seu banco.</li><li>Escolha Pix e escaneie o QR Code.</li><li>Confira o valor e confirme.</li></ol><label for="pix-copia-cola">Pix Copia e Cola</label><div class="copia-cola"><input id="pix-copia-cola" readonly><button type="button" class="btn btn-secundario" id="btn-copiar-pix">Copiar</button></div><div class="status-pagamento pendente" id="status-pagamento"><span class="status-pulso"></span> Aguardando pagamento</div></div></div>
+      </section>
+    </div>
   </main>
   <footer class="checkout-footer"><i class="fa-solid fa-lock"></i> Ambiente seguro · Casa Marisol</footer>
   <script src="/js/cart.js"></script><script src="/js/checkout.js"></script>
