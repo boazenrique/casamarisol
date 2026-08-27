@@ -100,7 +100,10 @@ router.post("/pedidos", async (req, res) => {
     });
   } catch (err) {
     console.error("Erro ao criar pedido:", err);
-    res.status(500).json({ erro: "Não foi possível gerar o pagamento Pix. Tente novamente." });
+    res.status(500).json({
+      erro: "Não foi possível gerar o pagamento Pix. Tente novamente.",
+      detalhe: err.message,
+    });
   }
 });
 
