@@ -138,11 +138,23 @@ router.post("/pedidos/:id/simular-pagamento", (req, res) => {
   res.json({ status: atualizado.status });
 });
 
-// Ponto de entrada para o webhook de um gateway Pix real (Mercado Pago,
-// Efí, Asaas, etc). Cada provedor tem um formato de payload diferente —
-// ajuste o parsing abaixo de acordo com o gateway escolhido.
+// Ponto de entrada para o webhook da ZuckPay (urlnoty). O payload vem
+// como { event, platform, transaction: { external_id_client, status, ... } }.
 router.post("/webhooks/pix", express.json(), (req, res) => {
-  console.log("Webhook Pix recebido:", JSON.stringify(req.body));
+  const payload = req.body || {};
+  console.log("Webhook Pix recebido:", JSON.stringify(payload));
+
+  const transacao = payload.transaction || payload;
+  const pedidoId = transacao.external_id_client || transacao.external_id;
+  const status = transacao.status;
+
+  if (pedidoId && status === "PAID") {
+    const pedido = orderStore.findById(pedidoId);
+    if (pedido && pedido.status !== "pago") {
+      orderStore.update(pedido.id, { status: "pago" });
+    }
+  }
+
   res.sendStatus(200);
 });
 
