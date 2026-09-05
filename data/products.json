@@ -100,6 +100,11 @@
     "estoque": 29,
     "nota": 4.97,
     "avaliacoes": 163,
+    "avaliacoesResumo": {
+      "nota": 4.97,
+      "total": 163,
+      "distribuicao": { "5": 158, "4": 5, "3": 0, "2": 0, "1": 0 }
+    },
     "sku": "NOVO16069MARGARINA",
     "descricao": [
       "Pote de vidro hermético 1040ml: mais organização e conservação para sua rotina.",
@@ -166,6 +171,11 @@
     "estoque": 13,
     "nota": 5.0,
     "avaliacoes": 22,
+    "avaliacoesResumo": {
+      "nota": 5.0,
+      "total": 22,
+      "distribuicao": { "5": 22, "4": 0, "3": 0, "2": 0, "1": 0 }
+    },
     "sku": "16079fuba",
     "descricaoResumo": "Faqueiro completo com 24 peças em aço inox, acabamento elegante e alta durabilidade para uso doméstico ou profissional.",
     "descricao": [
@@ -235,6 +245,11 @@
     "estoque": 16,
     "nota": 4.98,
     "avaliacoes": 44,
+    "avaliacoesResumo": {
+      "nota": 4.98,
+      "total": 44,
+      "distribuicao": { "5": 43, "4": 1, "3": 0, "2": 0, "1": 0 }
+    },
     "sku": "CONJ-MARINEX-5PC",
     "descricao": [
       "Conjunto jogo de Marinex com 5 peças em vidro — travessas e assadeiras.",
@@ -273,6 +288,11 @@
     "estoque": 12,
     "nota": 4.98,
     "avaliacoes": 57,
+    "avaliacoesResumo": {
+      "nota": 4.98,
+      "total": 57,
+      "distribuicao": { "5": 56, "4": 1, "3": 0, "2": 0, "1": 0 }
+    },
     "sku": "CV-336vinagrete",
     "imagens": ["/images/Pote Vinagrete/1.jpg"]
   },
@@ -289,6 +309,11 @@
     "estoque": 30,
     "nota": 4.9,
     "avaliacoes": 76,
+    "avaliacoesResumo": {
+      "nota": 4.9,
+      "total": 76,
+      "distribuicao": { "5": 69, "4": 7, "3": 0, "2": 0, "1": 0 }
+    },
     "sku": "KIT-GARRAFA-MYBOX",
     "descricaoResumo": "Kit com 3 Garrafas Transparentes Acrílicas Para Água, Suco, Chá e Leite.",
     "descricao": [
@@ -339,6 +364,11 @@
     "estoque": 47,
     "nota": 4.9,
     "avaliacoes": 134,
+    "avaliacoesResumo": {
+      "nota": 4.9,
+      "total": 134,
+      "distribuicao": { "5": 123, "4": 9, "3": 2, "2": 0, "1": 0 }
+    },
     "sku": "BRINOX-CERAMIC-SMARTPLUS-8PC",
     "descricaoResumo": "Conjunto de panelas Smart Plus 8 peças com revestimento Pro Ceramic Premium, livre de metais pesados e substâncias tóxicas.",
     "descricao": [
@@ -385,6 +415,77 @@
       "/images/brinox/35.webp",
       "/images/brinox/36.webp",
       "/images/brinox/37.webp"
+    ]
+  },
+  {
+    "id": "GAABOR-MULTISLICE-2L-PRETO",
+    "slug": "processador-multislice-gaabor-2-litros-vidro-4-laminas-preto",
+    "nome": "Processador Multislice Gaabor 2 Litros Vidro 4 Lâminas Cor Preto",
+    "marca": "Gaabor",
+    "categoria": ["Cozinha", "Casa"],
+    "precoDe": 168.0,
+    "precoPix": 137.0,
+    "precoCartao": 143.85,
+    "parcelasCartao": 1,
+    "estoque": 50,
+    "nota": 4.9,
+    "avaliacoes": 376,
+    "avaliacoesResumo": {
+      "nota": 4.9,
+      "total": 376,
+      "distribuicao": { "5": 344, "4": 28, "3": 4, "2": 0, "1": 0 }
+    },
+    "sku": "MG-15M02AS-PRETO",
+    "descricaoResumo": "Processador de Alimentos Gaabor Multislice 300W, com copo de vidro de 2 litros e 4 lâminas de metal, ideal para picar, triturar e preparar receitas do dia a dia com rapidez.",
+    "descricao": [
+      "Transforme sua rotina na cozinha com o Processador de Alimentos Gaabor Multislice MG-15M02AS. Com potência de 300W, ele é ideal para quem busca praticidade e eficiência no preparo de receitas do dia a dia. Seja para picar legumes, triturar ingredientes ou preparar massas, ele entrega um desempenho rápido e confiável.",
+      "Seu design compacto com capacidade de 2,0 litros permite preparar porções generosas sem ocupar muito espaço na bancada. Além de bonito, ele é funcional e combina facilmente com qualquer estilo de cozinha, trazendo mais organização e estilo para o ambiente.",
+      "Com o Gaabor MG-15M02AS, você tem a certeza de um equipamento preciso e moderno, pronto para facilitar seu dia a dia."
+    ],
+    "beneficios": [
+      "Potência de 300 W",
+      "Capacidade do copo processador de 2 L para preparar grandes quantidades",
+      "Velocidade máxima de rotação de 28.000 RPM para resultados rápidos",
+      "Funções de processar e triturar para versatilidade na cozinha",
+      "Lâminas de metal para durabilidade e eficiência no corte",
+      "Trava de segurança para maior proteção durante o uso",
+      "Corpo leve e fácil de manusear"
+    ],
+    "especificacoes": [
+      { "chave": "Marca", "valor": "Gaabor" },
+      { "chave": "Modelo", "valor": "MG-15M02AS" },
+      { "chave": "Cor", "valor": "Preto" },
+      { "chave": "Potência", "valor": "300 W" },
+      { "chave": "Capacidade", "valor": "2 Litros" },
+      { "chave": "Recipiente", "valor": "Vidro, 6mm" },
+      { "chave": "Quantidade de lâminas", "valor": "4 lâminas de metal" },
+      { "chave": "Ajuste de velocidade", "valor": "Sim" },
+      { "chave": "Rotação máxima", "valor": "28.000 RPM" },
+      { "chave": "Dimensões da embalagem (C x L x A)", "valor": "32,4 x 21,8 x 18,7 cm" },
+      { "chave": "Peso bruto", "valor": "2 kg" },
+      { "chave": "EAN", "valor": "4897121009113" },
+      { "chave": "SKU", "valor": "MG-15M02AS-PRETO" }
+    ],
+    "opcoes": [
+      {
+        "id": "voltagem",
+        "nome": "Voltagem",
+        "escolhas": [
+          { "id": "127v", "label": "127V" },
+          { "id": "220v", "label": "220V" }
+        ]
+      }
+    ],
+    "atencao": "Imagens de caráter ilustrativo. Informações divulgadas de acordo com o manual do fabricante.",
+    "imagens": [
+      "/images/processador/111.webp",
+      "/images/processador/112.webp",
+      "/images/processador/113.webp",
+      "/images/processador/114.webp",
+      "/images/processador/115.webp",
+      "/images/processador/116.webp",
+      "/images/processador/117.webp",
+      "/images/processador/118.webp"
     ]
   }
 ]

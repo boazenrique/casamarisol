@@ -1,0 +1,182 @@
+[
+  {
+    "nome": "Ana Paula",
+    "cidade": "São Paulo - SP",
+    "data": "2026-08-30",
+    "estrelas": 5,
+    "comentario": "Chegou tudo certinho e muito bem embalado! A qualidade dos produtos me surpreendeu. Com certeza vou comprar novamente. ❤️",
+    "recomenda": true,
+    "foto": "/images/clientes/Ana paula.avif"
+  },
+  {
+    "nome": "Juliana Oliveira",
+    "cidade": "Belo Horizonte - MG",
+    "data": "2026-08-27",
+    "estrelas": 5,
+    "comentario": "Já conheço a Casa Marisol há bastante tempo e sempre tive uma ótima experiência. Produtos de qualidade e atendimento excelente. Loja super confiável!",
+    "recomenda": true,
+    "foto": "/images/clientes/Sandra Oliveira.webp"
+  },
+  {
+    "nome": "João Batista",
+    "cidade": "Porto Alegre - RS",
+    "data": "2026-08-24",
+    "estrelas": 5,
+    "comentario": "Minha experiência com a Casa Marisol foi excelente! Produto de ótima qualidade, chegou dentro do prazo e exatamente como anunciado. Super recomendo!",
+    "recomenda": true,
+    "foto": "/images/clientes/Joao Batista.jpg"
+  },
+  {
+    "nome": "Camila Ferreira",
+    "cidade": "Salvador - BA",
+    "data": "2026-08-21",
+    "estrelas": 5,
+    "comentario": "Minha compra chegou perfeita! Tudo muito bem embalado e com uma qualidade incrível. Dá gosto comprar em uma loja assim. 👏",
+    "recomenda": true,
+    "foto": "/images/clientes/Claudia Ferreira.webp"
+  },
+  {
+    "nome": "Fernanda Martins",
+    "cidade": "Recife - PE",
+    "data": "2026-08-18",
+    "estrelas": 5,
+    "comentario": "Sempre fico satisfeita comprando aqui. Produtos de qualidade, entrega certinha e uma loja em que realmente dá para confiar.",
+    "recomenda": true,
+    "foto": "/images/clientes/Fernanda costa.jpg"
+  },
+  {
+    "nome": "Lucas Almeida",
+    "cidade": "Fortaleza - CE",
+    "data": "2026-08-15",
+    "estrelas": 5,
+    "comentario": "Amei minha compra! O produto chegou exatamente como esperado e a qualidade é maravilhosa. Com certeza vou comprar novamente. 🥰",
+    "recomenda": true,
+    "foto": "/images/clientes/Lucas Almeida.avif"
+  },
+  {
+    "nome": "Larissa Costa",
+    "cidade": "Curitiba - PR",
+    "data": "2026-08-11",
+    "estrelas": 5,
+    "comentario": "Mais uma compra recebida com sucesso! ❤️ Tudo perfeito, bem embalado e com excelente qualidade. Recomendo muito!",
+    "recomenda": true,
+    "foto": "/images/clientes/patricia Souza.jpg"
+  },
+  {
+    "nome": "Carolina Mendes",
+    "cidade": "Brasília - DF",
+    "data": "2026-08-07",
+    "estrelas": 5,
+    "comentario": "Uma das minhas lojas favoritas! Produtos de qualidade, atendimento excelente e uma experiência de compra muito tranquila.",
+    "recomenda": true,
+    "foto": "/images/clientes/Juliana mendes.jpg"
+  },
+  {
+    "nome": "Marcos Vinícius",
+    "cidade": "Campinas - SP",
+    "data": "2026-08-03",
+    "estrelas": 5,
+    "comentario": "Produto chegou rapidinho e em perfeito estado. A qualidade é muito boa e o preço também vale super a pena. Recomendo demais!",
+    "recomenda": true,
+    "foto": "/images/clientes/Marcos vinicius.jpg"
+  },
+  {
+    "nome": "Renata Carvalho",
+    "cidade": "Goiânia - GO",
+    "data": "2026-07-30",
+    "estrelas": 5,
+    "comentario": "Chegou tudo direitinho! Produto bonito, bem feito e exatamente como mostrado no site. Estou muito satisfeita com a compra.",
+    "recomenda": true,
+    "foto": "/images/clientes/maria aparecida.avif"
+  },
+  {
+    "nome": "Vanessa Lima",
+    "cidade": "Florianópolis - SC",
+    "data": "2026-07-26",
+    "estrelas": 5,
+    "comentario": "Casa Marisol é confiança! Sempre tive uma ótima experiência com a loja. Produtos bons e atendimento muito bom.",
+    "recomenda": true,
+    "foto": "/images/clientes/images.jpg"
+  },
+  {
+    "nome": "Pedro Henrique",
+    "cidade": "Manaus - AM",
+    "data": "2026-07-22",
+    "estrelas": 5,
+    "comentario": "A qualidade realmente me surpreendeu! Produto chegou perfeito e muito bem embalado. Com certeza voltarei para comprar mais.",
+    "recomenda": true,
+    "foto": "/images/clientes/Pedro henrique.jpg"
+  },
+  {
+    "nome": "Gabriela Santos",
+    "cidade": "Belém - PA",
+    "data": "2026-07-18",
+    "estrelas": 5,
+    "comentario": "Pedido recebido e aprovado! 😍 Tudo certinho, ótima qualidade e embalagem muito cuidadosa. Recomendo para quem ainda está na dúvida.",
+    "recomenda": true,
+    "foto": "/images/clientes/010.jpg"
+  },
+  {
+    "nome": "Aline Barbosa",
+    "cidade": "Vitória - ES",
+    "data": "2026-07-14",
+    "estrelas": 5,
+    "comentario": "Mais uma compra concluída com sucesso! Produto perfeito, ótima qualidade e entrega tranquila. Só tenho elogios à loja!",
+    "recomenda": true,
+    "foto": "/images/clientes/Ana paula.avif"
+  },
+  {
+    "nome": "Roberto Silva",
+    "cidade": "Natal - RN",
+    "data": "2026-07-10",
+    "estrelas": 5,
+    "comentario": "Produtos excelentes e uma loja super confiável. Minha compra chegou certinha e exatamente como eu esperava. ❤️",
+    "recomenda": true,
+    "foto": "/images/clientes/Roberto Silva.jpg"
+  },
+  {
+    "nome": "Débora Fernandes",
+    "cidade": "João Pessoa - PB",
+    "data": "2026-07-05",
+    "estrelas": 5,
+    "comentario": "Fiquei muito satisfeita com a compra. Chegou tudo conforme o pedido e a qualidade é excelente. Já estou de olho em outros produtos!",
+    "recomenda": true,
+    "foto": "/images/clientes/Sandra Oliveira.webp"
+  },
+  {
+    "nome": "Natália Gomes",
+    "cidade": "Uberlândia - MG",
+    "data": "2026-07-01",
+    "estrelas": 5,
+    "comentario": "Produto lindo e de ótima qualidade! Chegou muito bem embalado e sem nenhum problema. Compra aprovada! ❤️",
+    "recomenda": true,
+    "foto": "/images/clientes/Claudia Ferreira.webp"
+  },
+  {
+    "nome": "Carlos Eduardo",
+    "cidade": "Londrina - PR",
+    "data": "2026-06-25",
+    "estrelas": 5,
+    "comentario": "Loja séria e confiável. Meu pedido chegou certinho, bem embalado e dentro do prazo. Recomendo muito!",
+    "recomenda": true,
+    "foto": "/images/clientes/carlos eduardo.avif"
+  },
+  {
+    "nome": "Priscila Nunes",
+    "cidade": "Ribeirão Preto - SP",
+    "data": "2026-06-19",
+    "estrelas": 5,
+    "comentario": "Super recomendo a Casa Marisol! Tudo muito organizado, produtos de qualidade e pedido entregue certinho.",
+    "recomenda": true,
+    "foto": "/images/clientes/Fernanda costa.jpg"
+  },
+  {
+    "nome": "Letícia Castro",
+    "cidade": "Niterói - RJ",
+    "data": "2026-06-12",
+    "estrelas": 5,
+    "comentario": "Adorei minha compra! Produto exatamente como na descrição, ótima qualidade e chegou muito bem embalado. Certamente vou comprar novamente!",
+    "recomenda": true,
+    "foto": "/images/clientes/Juliana mendes.jpg"
+  }
+]

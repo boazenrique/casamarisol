@@ -93,6 +93,25 @@
           </div>
         <% } %>
 
+        <% if (produto.opcoes && produto.opcoes.length) { %>
+          <% produto.opcoes.forEach(function(opcao) { %>
+            <div class="selecao-variacao" data-opcao-grupo="<%= opcao.id %>" data-opcao-grupo-nome="<%= opcao.nome %>">
+              <div class="rotulo-variacao"><%= opcao.nome %></div>
+              <div class="opcoes-variacao">
+                <% opcao.escolhas.forEach(function(escolha) { %>
+                  <button
+                    type="button"
+                    class="opcao-variacao opcao-simples"
+                    data-grupo="<%= opcao.id %>"
+                    data-id="<%= escolha.id %>"
+                    data-label="<%= escolha.label %>"
+                  ><%= escolha.label %></button>
+                <% }) %>
+              </div>
+            </div>
+          <% }) %>
+        <% } %>
+
         <div class="acoes-produto">
           <button type="button" class="btn btn-primario btn-bloco" id="btn-comprar">Comprar agora</button>
         </div>
@@ -208,6 +227,12 @@
     <% if (produto.avaliacoesResumo) { %>
       <%- include("partials/avaliacoes", { produto: produto }) %>
     <% } %>
+
+    <div class="banner-produto">
+      <a href="/">
+        <img src="/images/banner 0244.png" alt="Ofertas Casa Marisol - até 50% de desconto e frete grátis" loading="lazy" />
+      </a>
+    </div>
 
     <% if (relacionados && relacionados.length) { %>
       <%- include("partials/relacionados", { relacionados: relacionados }) %>

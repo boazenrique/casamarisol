@@ -44,7 +44,7 @@
   /* ---------- Variação (capacidade) ---------- */
   const idProdutoBase = produto.id;
   const nomeProdutoBase = produto.nome;
-  const opcoesVariacao = Array.from(document.querySelectorAll(".opcao-variacao"));
+  const opcoesVariacao = Array.from(document.querySelectorAll(".opcao-variacao:not(.opcao-simples)"));
 
   function formatarMoeda(valor) {
     return valor.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -71,6 +71,33 @@
   });
 
   if (opcoesVariacao.length) selecionarVariacao(opcoesVariacao[0]);
+
+  /* ---------- Opções sem impacto no preço (ex.: voltagem) ---------- */
+  const gruposOpcoes = Array.from(document.querySelectorAll("[data-opcao-grupo]"));
+  const selecaoOpcoes = {};
+
+  gruposOpcoes.forEach((grupo) => {
+    const botoesGrupo = Array.from(grupo.querySelectorAll(".opcao-simples"));
+    botoesGrupo.forEach((botao) => {
+      botao.addEventListener("click", () => {
+        botoesGrupo.forEach((b) => b.classList.remove("ativa"));
+        botao.classList.add("ativa");
+        selecaoOpcoes[botao.dataset.grupo] = botao;
+      });
+    });
+  });
+
+  function aplicarOpcoesNoProduto() {
+    const grupoFaltante = gruposOpcoes.find((g) => !selecaoOpcoes[g.dataset.opcaoGrupo]);
+    if (grupoFaltante) {
+      carrinho.mostrarToast(`Selecione: ${grupoFaltante.dataset.opcaoGrupoNome}`);
+      return false;
+    }
+    const botoesEscolhidos = gruposOpcoes.map((g) => selecaoOpcoes[g.dataset.opcaoGrupo]);
+    produto.id = `${idProdutoBase}::${botoesEscolhidos.map((b) => b.dataset.id).join("+")}`;
+    produto.nome = `${nomeProdutoBase} - ${botoesEscolhidos.map((b) => b.dataset.label).join(" - ")}`;
+    return true;
+  }
 
   /* ---------- Quantidade / estoque ---------- */
   const inputQtd = document.getElementById("input-qtd");
@@ -109,6 +136,7 @@
   }
 
   btnComprar.addEventListener("click", () => {
+    if (gruposOpcoes.length && !aplicarOpcoesNoProduto()) return;
     btnComprar.disabled = true;
     btnComprar.innerHTML = `<span class="spinner"></span> Preparando compra...`;
     carrinho.adicionarItem(produto, quantidadeAtual());

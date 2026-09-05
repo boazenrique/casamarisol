@@ -39,8 +39,15 @@
   <div class="lista-avaliacoes" id="lista-avaliacoes">
     <% produto.avaliacoesLista.forEach(function(av) { %>
       <div class="avaliacao-item" data-estrelas="<%= av.estrelas %>">
-        <div class="estrelas-item"><%= "★".repeat(av.estrelas) + "☆".repeat(5 - av.estrelas) %></div>
-        <div class="autor-avaliacao"><%= av.nome %></div>
+        <div class="cabecalho-avaliacao-item">
+          <% if (av.foto) { %>
+            <img class="avatar-avaliacao" src="<%= av.foto %>" alt="Foto de <%= av.nome %>" loading="lazy" />
+          <% } %>
+          <div>
+            <div class="autor-avaliacao"><%= av.nome %></div>
+            <div class="estrelas-item"><%= "★".repeat(av.estrelas) + "☆".repeat(5 - av.estrelas) %></div>
+          </div>
+        </div>
         <div class="meta-avaliacao">
           <span><%= new Date(av.data + "T00:00:00").toLocaleDateString("pt-BR") %></span>
           <span><%= av.cidade %></span>

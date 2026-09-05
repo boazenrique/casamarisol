@@ -3,6 +3,7 @@ const router = express.Router();
 const produtos = require("../lib/products");
 const orderStore = require("../lib/orderStore");
 const { getPixProvider } = require("../lib/pixProvider");
+const { notificarDracofy } = require("../lib/dracofy");
 
 function gerarIdPedido() {
   const carimbo = Date.now().toString(36).toUpperCase();
@@ -35,7 +36,7 @@ router.post("/carrinho/validar", (req, res) => {
 
 router.post("/pedidos", async (req, res) => {
   try {
-    const { cliente, endereco, itens } = req.body;
+    const { cliente, endereco, itens, clickId } = req.body;
 
     if (!cliente?.nome || !cliente?.email || !cliente?.telefone) {
       return res.status(400).json({ erro: "Dados do cliente incompletos." });
@@ -72,6 +73,7 @@ router.post("/pedidos", async (req, res) => {
       valor: Number(total.toFixed(2)),
       descricao: `Pedido ${id} - Casa Marisol`,
       cliente,
+      clickId: typeof clickId === "string" && clickId.trim() ? clickId.trim() : null,
     });
 
     const pedido = {
@@ -83,6 +85,7 @@ router.post("/pedidos", async (req, res) => {
       total: Number(total.toFixed(2)),
       status: "pendente",
       pagamento,
+      clickId: typeof clickId === "string" && clickId.trim() ? clickId.trim() : null,
     };
 
     try {
@@ -134,7 +137,8 @@ router.get("/pedidos/:id/status", async (req, res) => {
       if (statusRemoto) {
         if (pedido && pedido.status !== statusRemoto) {
           try {
-            orderStore.update(pedido.id, { status: statusRemoto });
+            const atualizado = orderStore.update(pedido.id, { status: statusRemoto });
+            if (statusRemoto === "pago") await notificarDracofy(atualizado);
           } catch (_) {}
         }
         return res.json({ status: statusRemoto });
@@ -150,19 +154,20 @@ router.get("/pedidos/:id/status", async (req, res) => {
 
 // Endpoint de apoio para ambiente de teste (MockPixProvider): confirma o
 // pagamento manualmente, simulando o webhook que um gateway real enviaria.
-router.post("/pedidos/:id/simular-pagamento", (req, res) => {
+router.post("/pedidos/:id/simular-pagamento", async (req, res) => {
   const pedido = orderStore.findById(req.params.id);
   if (!pedido) return res.status(404).json({ erro: "Pedido não encontrado." });
   if (pedido.pagamento.ambiente !== "teste") {
     return res.status(403).json({ erro: "Disponível apenas no ambiente de teste." });
   }
   const atualizado = orderStore.update(pedido.id, { status: "pago" });
+  await notificarDracofy(atualizado);
   res.json({ status: atualizado.status });
 });
 
 // Ponto de entrada para o webhook da ZuckPay (urlnoty). O payload vem
 // como { event, platform, transaction: { external_id_client, status, ... } }.
-router.post("/webhooks/pix", express.json(), (req, res) => {
+router.post("/webhooks/pix", express.json(), async (req, res) => {
   const payload = req.body || {};
   console.log("Webhook Pix recebido:", JSON.stringify(payload));
 
@@ -177,7 +182,8 @@ router.post("/webhooks/pix", express.json(), (req, res) => {
     try {
       const pedido = orderStore.findById(pedidoId);
       if (pedido && pedido.status !== "pago") {
-        orderStore.update(pedido.id, { status: "pago" });
+        const atualizado = orderStore.update(pedido.id, { status: "pago" });
+        await notificarDracofy(atualizado);
       }
     } catch (_) {}
   }

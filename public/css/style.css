@@ -958,6 +958,16 @@ input:focus, select:focus { outline: none; border-color: var(--azul); }
 }
 .avaliacao-item .estrelas-item { color: var(--amarelo); font-size: 14px; letter-spacing: 1px; margin-bottom: 6px; }
 .avaliacao-item .autor-avaliacao { font-weight: 700; font-size: 13.5px; }
+.cabecalho-avaliacao-item { display: flex; align-items: center; gap: 10px; }
+.cabecalho-avaliacao-item .estrelas-item { margin-bottom: 0; }
+.avatar-avaliacao {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 1px solid var(--cinza-borda);
+}
 .avaliacao-item .meta-avaliacao { font-size: 12px; color: var(--texto-suave); display: flex; gap: 10px; margin: 3px 0 10px; }
 .avaliacao-item .comentario-avaliacao { font-size: 13.5px; line-height: 1.6; margin: 0 0 10px; color: var(--texto); }
 .selo-recomenda {
@@ -1045,6 +1055,15 @@ input:focus, select:focus { outline: none; border-color: var(--azul); }
 }
 
 /* ================= Produtos relacionados ================= */
+.banner-produto { margin-top: 20px; }
+.banner-produto img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: var(--raio);
+  border: 1px solid var(--cinza-borda);
+}
+
 .secao-relacionados { margin-top: 20px; }
 .titulo-centralizado { text-align: center; font-size: 17px; font-weight: 700; margin: 0 0 18px; }
 
