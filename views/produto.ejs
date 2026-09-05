@@ -51,11 +51,11 @@
         </div>
 
         <div class="bloco-preco">
-          <div class="preco-de">De <%= produto.precoDe.toLocaleString("pt-BR", {style:"currency", currency:"BRL"}) %></div>
+          <div class="preco-de" id="preco-de">De <%= produto.precoDe.toLocaleString("pt-BR", {style:"currency", currency:"BRL"}) %></div>
           <div class="preco-pix">
-            <span class="valor"><%= produto.precoPix.toLocaleString("pt-BR", {style:"currency", currency:"BRL"}) %></span>
+            <span class="valor" id="preco-pix-valor"><%= produto.precoPix.toLocaleString("pt-BR", {style:"currency", currency:"BRL"}) %></span>
             <span class="rotulo-pix">no Pix</span>
-            <span class="selo-off">🏷️ <%= Math.round((1 - produto.precoPix / produto.precoDe) * 100) %>% OFF</span>
+            <span class="selo-off" id="selo-off">🏷️ <%= Math.round((1 - produto.precoPix / produto.precoDe) * 100) %>% OFF</span>
           </div>
           <div class="pix-envio-caixa">
             <img src="/images/pix.png" alt="Pix" class="pix-envio-icone" />
@@ -74,6 +74,24 @@
           </div>
           <span class="estoque-info disponivel" id="estoque-info"><%= produto.estoque %> em estoque</span>
         </div>
+
+        <% if (produto.variacoes && produto.variacoes.length) { %>
+          <div class="selecao-variacao">
+            <div class="rotulo-variacao">Capacidade</div>
+            <div class="opcoes-variacao" id="opcoes-variacao">
+              <% produto.variacoes.forEach(function(v, i) { %>
+                <button
+                  type="button"
+                  class="opcao-variacao <%= i === 0 ? 'ativa' : '' %>"
+                  data-id="<%= v.id %>"
+                  data-capacidade="<%= v.capacidade %>"
+                  data-preco-pix="<%= v.precoPix %>"
+                  data-preco-de="<%= v.precoDe %>"
+                ><%= v.capacidade %></button>
+              <% }) %>
+            </div>
+          </div>
+        <% } %>
 
         <div class="acoes-produto">
           <button type="button" class="btn btn-primario btn-bloco" id="btn-comprar">Comprar agora</button>
@@ -205,6 +223,7 @@
       imagem: produto.imagens[0],
       precoPix: produto.precoPix,
       estoque: produto.estoque,
+      variacoes: produto.variacoes || null,
     }) %>;
     window.__LOJA__ = <%- JSON.stringify({ freteGratisAcima: loja.freteGratisAcima }) %>;
   </script>

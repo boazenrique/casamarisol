@@ -9,6 +9,11 @@
     "precoPix": 52.89,
     "precoCartao": 55.51,
     "parcelasCartao": 1,
+    "variacoes": [
+      { "id": "370ml", "capacidade": "370ml", "precoDe": 94.9, "precoPix": 52.89 },
+      { "id": "640ml", "capacidade": "640ml", "precoDe": 139.9, "precoPix": 77.9 },
+      { "id": "800ml", "capacidade": "800ml", "precoDe": 179.9, "precoPix": 99.9 }
+    ],
     "estoque": 109,
     "nota": 4.97,
     "avaliacoes": 713,

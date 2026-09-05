@@ -41,6 +41,37 @@
   if (setaAnterior) setaAnterior.addEventListener("click", () => mostrarMidia(indiceAtual - 1));
   if (setaProxima) setaProxima.addEventListener("click", () => mostrarMidia(indiceAtual + 1));
 
+  /* ---------- Variação (capacidade) ---------- */
+  const idProdutoBase = produto.id;
+  const nomeProdutoBase = produto.nome;
+  const opcoesVariacao = Array.from(document.querySelectorAll(".opcao-variacao"));
+
+  function formatarMoeda(valor) {
+    return valor.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+  }
+
+  function selecionarVariacao(botao) {
+    opcoesVariacao.forEach((b) => b.classList.remove("ativa"));
+    botao.classList.add("ativa");
+
+    const precoPix = Number(botao.dataset.precoPix);
+    const precoDe = Number(botao.dataset.precoDe);
+
+    produto.id = `${idProdutoBase}::${botao.dataset.id}`;
+    produto.nome = `${nomeProdutoBase} - ${botao.dataset.capacidade}`;
+    produto.precoPix = precoPix;
+
+    document.getElementById("preco-pix-valor").textContent = formatarMoeda(precoPix);
+    document.getElementById("preco-de").textContent = `De ${formatarMoeda(precoDe)}`;
+    document.getElementById("selo-off").textContent = `🏷️ ${Math.round((1 - precoPix / precoDe) * 100)}% OFF`;
+  }
+
+  opcoesVariacao.forEach((botao) => {
+    botao.addEventListener("click", () => selecionarVariacao(botao));
+  });
+
+  if (opcoesVariacao.length) selecionarVariacao(opcoesVariacao[0]);
+
   /* ---------- Quantidade / estoque ---------- */
   const inputQtd = document.getElementById("input-qtd");
   const estoqueInfo = document.getElementById("estoque-info");

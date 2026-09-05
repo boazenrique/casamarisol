@@ -592,6 +592,32 @@ button { font-family: inherit; }
 .estoque-info.baixo { color: #a15c00; }
 .estoque-info.esgotado { color: var(--vermelho); }
 
+/* ----- Variação (capacidade) ----- */
+.selecao-variacao { margin-bottom: 14px; }
+.rotulo-variacao {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--texto-suave);
+  margin-bottom: 8px;
+}
+.opcoes-variacao { display: flex; flex-wrap: wrap; gap: 8px; }
+.opcao-variacao {
+  padding: 8px 16px;
+  border: 1px solid var(--cinza-borda-forte);
+  border-radius: var(--raio-sm);
+  background: var(--branco);
+  color: var(--texto);
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.opcao-variacao:hover { border-color: var(--verde); }
+.opcao-variacao.ativa {
+  border-color: var(--verde);
+  background: var(--verde-bg);
+  color: var(--verde-escuro);
+}
+
 /* ----- Ações ----- */
 .acoes-produto { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
 
