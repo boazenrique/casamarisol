@@ -1,22 +1,24 @@
-# Preparacao do Rastreio Express
+# Preparacao da credencial do Rastreio Express
 
-A credencial exclusiva desta oferta fica em `RASTREIO_EXPRESS_API_KEY`, no
-arquivo `.env` local do backend, carregado pelo dotenv em `server.js`.
-O arquivo e suas variantes estao ignorados pelo Git. O exemplo nao contem valor.
-Em producao, configurar a mesma variavel no gerenciador de secrets da hospedagem;
-a configuracao local nao atualiza automaticamente o servidor publicado.
+A unica fonte da credencial e process.env.RASTREIO_EXPRESS_API_KEY.
+O dotenv ja carrega o arquivo .env no backend em server.js; esse arquivo e
+ignorado pelo Git. Esta etapa nao modifica a credencial nem o arquivo .env.
 
-`RASTREIO_EXPRESS_ENABLED=false` mantem a integracao inativa, inclusive para
-chamadas diretas ao cliente. A preparacao nao envia pedidos nem credenciais.
-O backend serve arquivos estaticos somente de `public/`.
-Nunca copiar a credencial para essa pasta, templates, logs ou respostas de API.
+lib/rastreioExpressClient.js mantem a leitura e validacao da chave em uma
+funcao privada. hasCredential() retorna somente um booleano. Nenhuma funcao
+exporta a chave ou headers de autenticacao. O modulo rejeita execucao no browser
+ e fica fora da pasta public, unica pasta de arquivos estaticos do servidor.
 
-Antes de ativar futuramente, confirmar com o Rastreio Express o dominio oficial,
-endpoint, autenticacao e contrato de dados: o cliente preexistente usa suposicoes
-ainda nao validadas. Revisar tambem respostas e erros do servico para evitar
-reflexao de credenciais, bloquear redirecionamentos e definir timeout.
-Nao ativar apenas por ter preenchido a chave.
+A integracao permanece bloqueada no proprio cliente: isConfigured() retorna
+false e enviarPedido() rejeita sem acessar a rede, mesmo que alguma flag externa
+seja ativada. O endpoint presumido e o transporte HTTP foram removidos.
 
-Nenhuma configuracao de gateway ou rota de pagamento foi editada nesta preparacao.
-Ja existiam alteracoes locais em `routes/api.js` ligando pagamentos ao Rastreio
-Express; foram preservadas, com o envio agora desativado por padrao.
+Para uma etapa futura autorizada, confirmar dominio, endpoint e esquema de
+autenticacao oficiais antes de implementar o transporte usando a leitura privada.
+Nao presumir Bearer ou outro header. Nao encaminhar respostas ou erros externos
+sem tratamento, nem registrar credenciais. A autenticacao remota nao foi testada.
+
+Esta etapa nao altera routes/api.js, lib/rastreioExpress.js, checkout, gateway,
+webhook, confirmacao de pagamento, precos, layout ou fluxo de pagamento.
+As chamadas preexistentes ao cliente permanecem inativas. Nao foi feita publicacao
+nem configuracao de secrets na hospedagem.
