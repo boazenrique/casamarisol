@@ -4,6 +4,7 @@ const produtos = require("../lib/products");
 const orderStore = require("../lib/orderStore");
 const { getPixProvider } = require("../lib/pixProvider");
 const { notificarDracofy } = require("../lib/dracofy");
+const { processarPedidoAprovado } = require("../lib/rastreioExpress");
 
 function gerarIdPedido() {
   const carimbo = Date.now().toString(36).toUpperCase();
@@ -135,10 +136,18 @@ router.get("/pedidos/:id/status", async (req, res) => {
         externalId: req.params.id,
       });
       if (statusRemoto) {
-        if (pedido && pedido.status !== statusRemoto) {
+        if (pedido) {
           try {
-            const atualizado = orderStore.update(pedido.id, { status: statusRemoto });
-            if (statusRemoto === "pago") await notificarDracofy(atualizado);
+            if (pedido.status !== statusRemoto) {
+              const atualizado = orderStore.update(pedido.id, { status: statusRemoto });
+              if (statusRemoto === "pago") await notificarDracofy(atualizado);
+            }
+            // Chamado em toda consulta com status "pago" (não só na primeira
+            // transição): confirmação real vinda da própria ZuckPay. A
+            // idempotência/retry fica a cargo de processarPedidoAprovado, que
+            // relê o pedido e reprocessa com segurança uma tentativa anterior
+            // que tenha falhado (ex.: Rastreio Express fora do ar).
+            if (statusRemoto === "pago") await processarPedidoAprovado(pedido);
           } catch (_) {}
         }
         return res.json({ status: statusRemoto });
@@ -162,6 +171,8 @@ router.post("/pedidos/:id/simular-pagamento", async (req, res) => {
   }
   const atualizado = orderStore.update(pedido.id, { status: "pago" });
   await notificarDracofy(atualizado);
+  // Simulação de pagamento (ambiente de teste) não é uma confirmação real:
+  // não deve gerar rastreio no Rastreio Express (regra 1 da integração).
   res.json({ status: atualizado.status });
 });
 
@@ -181,9 +192,17 @@ router.post("/webhooks/pix", express.json(), async (req, res) => {
     // diretamente pelo external_id_client.
     try {
       const pedido = orderStore.findById(pedidoId);
-      if (pedido && pedido.status !== "pago") {
-        const atualizado = orderStore.update(pedido.id, { status: "pago" });
-        await notificarDracofy(atualizado);
+      if (pedido) {
+        if (pedido.status !== "pago") {
+          const atualizado = orderStore.update(pedido.id, { status: "pago" });
+          await notificarDracofy(atualizado);
+        }
+        // Chamado em toda notificação "PAID" (inclusive webhook duplicado):
+        // confirmação real vinda do webhook oficial da ZuckPay. A
+        // idempotência/retry fica a cargo de processarPedidoAprovado, que
+        // relê o pedido e reprocessa com segurança uma tentativa anterior
+        // que tenha falhado (ex.: Rastreio Express fora do ar).
+        await processarPedidoAprovado(pedido);
       }
     } catch (_) {}
   }
