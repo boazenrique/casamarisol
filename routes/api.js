@@ -4,6 +4,7 @@ const produtos = require("../lib/products");
 const orderStore = require("../lib/orderStore");
 const { getPixProvider } = require("../lib/pixProvider");
 const { notificarDracofy } = require("../lib/dracofy");
+const { normalizeAttribution } = require("../lib/attribution");
 const { processarPedidoAprovado } = require("../lib/rastreioExpress");
 
 function gerarIdPedido() {
@@ -38,6 +39,7 @@ router.post("/carrinho/validar", (req, res) => {
 router.post("/pedidos", async (req, res) => {
   try {
     const { cliente, endereco, itens, clickId } = req.body;
+    const attribution = normalizeAttribution(req.body.attribution, clickId);
 
     if (!cliente?.nome || !cliente?.email || !cliente?.telefone) {
       return res.status(400).json({ erro: "Dados do cliente incompletos." });
@@ -74,7 +76,8 @@ router.post("/pedidos", async (req, res) => {
       valor: Number(total.toFixed(2)),
       descricao: `Pedido ${id} - Casa Marisol`,
       cliente,
-      clickId: typeof clickId === "string" && clickId.trim() ? clickId.trim() : null,
+      clickId: attribution.click_id || null,
+      attribution,
     });
 
     const pedido = {
@@ -86,7 +89,8 @@ router.post("/pedidos", async (req, res) => {
       total: Number(total.toFixed(2)),
       status: "pendente",
       pagamento,
-      clickId: typeof clickId === "string" && clickId.trim() ? clickId.trim() : null,
+      clickId: attribution.click_id || null,
+      attribution,
     };
 
     try {
@@ -139,16 +143,22 @@ router.get("/pedidos/:id/status", async (req, res) => {
         if (pedido) {
           try {
             if (pedido.status !== statusRemoto) {
-              const atualizado = orderStore.update(pedido.id, { status: statusRemoto });
-              if (statusRemoto === "pago") await notificarDracofy(atualizado);
+              orderStore.update(pedido.id, { status: statusRemoto });
             }
             // Chamado em toda consulta com status "pago" (não só na primeira
             // transição): confirmação real vinda da própria ZuckPay. A
             // idempotência/retry fica a cargo de processarPedidoAprovado, que
             // relê o pedido e reprocessa com segurança uma tentativa anterior
             // que tenha falhado (ex.: Rastreio Express fora do ar).
-            if (statusRemoto === "pago") await processarPedidoAprovado(pedido);
-          } catch (_) {}
+            if (statusRemoto === "pago") {
+              await notificarDracofy(orderStore.findById(pedido.id));
+              await processarPedidoAprovado(pedido);
+            }
+          } catch (err) {
+            console.warn(`Falha ao processar confirmação do pedido ${pedido.id}:`, err.message);
+          }
+        } else if (statusRemoto === "pago") {
+          console.warn(`Pedido ${req.params.id} pago sem registro local; atribuição indisponível.`);
         }
         return res.json({ status: statusRemoto });
       }
@@ -194,17 +204,21 @@ router.post("/webhooks/pix", express.json(), async (req, res) => {
       const pedido = orderStore.findById(pedidoId);
       if (pedido) {
         if (pedido.status !== "pago") {
-          const atualizado = orderStore.update(pedido.id, { status: "pago" });
-          await notificarDracofy(atualizado);
+          orderStore.update(pedido.id, { status: "pago" });
         }
         // Chamado em toda notificação "PAID" (inclusive webhook duplicado):
         // confirmação real vinda do webhook oficial da ZuckPay. A
         // idempotência/retry fica a cargo de processarPedidoAprovado, que
         // relê o pedido e reprocessa com segurança uma tentativa anterior
         // que tenha falhado (ex.: Rastreio Express fora do ar).
+        await notificarDracofy(orderStore.findById(pedido.id));
         await processarPedidoAprovado(pedido);
+      } else {
+        console.warn(`Webhook Pix: pedido ${pedidoId} não encontrado; atribuição indisponível.`);
       }
-    } catch (_) {}
+    } catch (err) {
+      console.warn(`Falha ao processar webhook do pedido ${pedidoId}:`, err.message);
+    }
   }
 
   res.sendStatus(200);

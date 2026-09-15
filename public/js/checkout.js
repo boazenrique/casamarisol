@@ -105,8 +105,9 @@
     const f = event.target;
     const cliente = { nome: f.nome.value.trim(), cpf: f.cpf.value, email: f.email.value.trim(), telefone: f.telefone.value };
     const endereco = { cep: f.cep.value, rua: f.rua.value.trim(), numero: f.numero.value.trim(), complemento: f.complemento.value.trim(), bairro: f.bairro.value.trim(), cidade: f.cidade.value.trim(), uf: f.uf.value };
-    const clickId = typeof DTrack !== "undefined" && typeof DTrack.getClickId === "function" ? DTrack.getClickId() : null;
-    try { const response = await fetch("/api/pedidos", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ cliente, endereco, itens: items, clickId }) }); const data = await response.json(); if (!response.ok) throw new Error(data.erro || "Não foi possível gerar o pagamento."); cart.limparCarrinho(); showPix(data); }
+    const attribution = window.CasaMarisolAttribution?.collect() || {};
+    const clickId = attribution.click_id || null;
+    try { const response = await fetch("/api/pedidos", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ cliente, endereco, itens: items, clickId, attribution }) }); const data = await response.json(); if (!response.ok) throw new Error(data.erro || "Não foi possível gerar o pagamento."); cart.limparCarrinho(); showPix(data); }
     catch (err) { error.textContent = err.message; error.style.display = "block"; button.disabled = false; button.textContent = "Confirmar pedido"; }
   };
 })();
