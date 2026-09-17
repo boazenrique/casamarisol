@@ -1,6 +1,6 @@
 (function () {
   const key = "casamarisol_attribution";
-  const fields = ["click_id", "fbc", "fbp", "utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "utm_id"];
+  const fields = ["click_id", "fbclid", "fbc", "fbp", "utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "utm_id"];
   let saved = {};
   try {
     const entry = JSON.parse(sessionStorage.getItem(key));
@@ -14,7 +14,11 @@
     if (value && value.trim()) saved[name] = value.trim().slice(0, 2048);
   }
   const fbclid = params.get("fbclid");
-  if (fbclid) saved.fbc = `fb.1.${Date.now()}.${fbclid.slice(0, 1900)}`;
+  if (fbclid) {
+    saved.fbc = `fb.1.${Date.now()}.${fbclid.slice(0, 1900)}`;
+    // Preserve the Meta click even when the SDK has not loaded yet.
+    if (!saved.click_id) saved.click_id = fbclid.trim().slice(0, 2048);
+  }
   function collect() {
     for (const name of ["fbc", "fbp"]) {
       const cookie = document.cookie.split(";").map((part) => part.trim()).find((part) => part.startsWith(`_${name}=`));

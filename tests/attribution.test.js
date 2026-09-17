@@ -25,6 +25,21 @@ test("preserves attribution from landing page through checkout without SDK", () 
   assert.equal(next.utm_campaign, undefined);
 });
 
+test("Meta click survives navigation before SDK loads", () => {
+  let value;
+  const storage = { getItem: () => value, setItem: (_, next) => { value = next; } };
+  page("?fbclid=meta-click", storage);
+  const checkout = page("", storage);
+  assert.equal(checkout.click_id, "meta-click");
+  assert.equal(checkout.fbclid, "meta-click");
+  assert.equal(normalizeAttribution(checkout).fbclid, "meta-click");
+});
+
+test("SDK supplies click captured on an earlier visit", () => {
+  const result = page("", { getItem: () => null, setItem() {} }, "", { getClickId: () => "sdk-click" });
+  assert.equal(result.click_id, "sdk-click");
+});
+
 test("blocked storage and broken SDK do not break checkout; cookies still work", () => {
   const blocked = { getItem() { throw Error(); }, setItem() { throw Error(); } };
   const result = page("?utm_source=facebook", blocked, "_fbc=fb.1.123.abc; _fbp=browser", { getClickId() { throw Error(); } });

@@ -3,7 +3,6 @@ const router = express.Router();
 const produtos = require("../lib/products");
 const orderStore = require("../lib/orderStore");
 const { getPixProvider } = require("../lib/pixProvider");
-const { notificarDracofy } = require("../lib/dracofy");
 const { normalizeAttribution } = require("../lib/attribution");
 const { processarPedidoAprovado } = require("../lib/rastreioExpress");
 
@@ -151,7 +150,7 @@ router.get("/pedidos/:id/status", async (req, res) => {
             // relê o pedido e reprocessa com segurança uma tentativa anterior
             // que tenha falhado (ex.: Rastreio Express fora do ar).
             if (statusRemoto === "pago") {
-              await notificarDracofy(orderStore.findById(pedido.id));
+              // Dracofy receives payment confirmation directly from ZuckPay.
               await processarPedidoAprovado(pedido);
             }
           } catch (err) {
@@ -180,7 +179,7 @@ router.post("/pedidos/:id/simular-pagamento", async (req, res) => {
     return res.status(403).json({ erro: "Disponível apenas no ambiente de teste." });
   }
   const atualizado = orderStore.update(pedido.id, { status: "pago" });
-  await notificarDracofy(atualizado);
+  // Simulated payments must not send advertising conversions.
   // Simulação de pagamento (ambiente de teste) não é uma confirmação real:
   // não deve gerar rastreio no Rastreio Express (regra 1 da integração).
   res.json({ status: atualizado.status });
@@ -211,7 +210,7 @@ router.post("/webhooks/pix", express.json(), async (req, res) => {
         // idempotência/retry fica a cargo de processarPedidoAprovado, que
         // relê o pedido e reprocessa com segurança uma tentativa anterior
         // que tenha falhado (ex.: Rastreio Express fora do ar).
-        await notificarDracofy(orderStore.findById(pedido.id));
+        // Dracofy receives payment confirmation directly from ZuckPay.
         await processarPedidoAprovado(pedido);
       } else {
         console.warn(`Webhook Pix: pedido ${pedidoId} não encontrado; atribuição indisponível.`);
