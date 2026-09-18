@@ -25,7 +25,7 @@ router.get("/carrinho", (req, res) => {
 });
 
 router.get("/checkout", (req, res) => {
-  res.render("checkout", { loja: LOJA });
+  res.render("checkout", { loja: LOJA, orderBumps: produtos.buscarOrderBump() });
 });
 
 router.get("/pagamento/:id", (req, res) => {

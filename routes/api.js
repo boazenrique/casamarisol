@@ -48,6 +48,14 @@ router.post("/pedidos", async (req, res) => {
     }
 
     const itensValidados = [];
+    const temPrincipal = itens.some((item) => {
+      const produto = produtos.buscarPorId(item.id);
+      return produto && !produto.orderBump && produto.estoque > 0;
+    });
+    if (!temPrincipal) {
+      return res.status(400).json({ erro: "Adicione um produto principal para finalizar o pedido." });
+    }
+    const bumpsIncluidos = new Set();
     let total = 0;
 
     for (const item of itens) {
@@ -55,7 +63,13 @@ router.post("/pedidos", async (req, res) => {
       if (!produto) {
         return res.status(400).json({ erro: `Produto ${item.id} não encontrado.` });
       }
-      const quantidade = Math.max(1, Math.min(parseInt(item.quantidade, 10) || 1, produto.estoque));
+      if (produto.orderBump) {
+        if (produto.estoque <= 0 || bumpsIncluidos.has(produto.id)) {
+          return res.status(400).json({ erro: "Oferta indisponível ou repetida no pedido." });
+        }
+        bumpsIncluidos.add(produto.id);
+      }
+      const quantidade = produto.orderBump ? 1 : Math.max(1, Math.min(parseInt(item.quantidade, 10) || 1, produto.estoque));
       const subtotal = produto.precoPix * quantidade;
       total += subtotal;
       itensValidados.push({

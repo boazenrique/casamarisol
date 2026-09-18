@@ -1,15 +1,38 @@
 (async function () {
   const cart = window.CasaMarisolCarrinho;
-  const items = await cart.sincronizarCarrinho();
+  let items = await cart.sincronizarCarrinho();
   const button = document.getElementById("btn-finalizar");
   const error = document.getElementById("erro-form");
   let timer;
   if (!items.length) return void (location.href = "/carrinho");
 
+  function atualizarResumo() {
   document.getElementById("resumo-itens").innerHTML = items.map((item) => `<article class="resumo-produto"><img src="${item.imagem}" alt=""><div><strong>${item.nome}</strong><small>${item.quantidade} unidade${item.quantidade > 1 ? "s" : ""}</small></div><b>${cart.formatarMoeda(item.quantidade * item.precoPix)}</b></article>`).join("");
   const total = cart.totalCarrinho(items);
   document.getElementById("resumo-subtotal").textContent = cart.formatarMoeda(total);
   document.getElementById("resumo-total-valor").textContent = cart.formatarMoeda(total);
+  }
+  atualizarResumo();
+
+  const bumps = [...document.querySelectorAll(".adicionar-order-bump")];
+  const bumpIds = new Set(bumps.map((bump) => bump.dataset.id));
+  if (bumps.length && items.some((item) => !bumpIds.has(item.id))) {
+    document.getElementById("order-bumps").hidden = false;
+    bumps.forEach((bump) => {
+    const oferta = bump.closest(".order-bump-produto");
+    bump.checked = items.some((item) => item.id === bump.dataset.id);
+    oferta.classList.toggle("selecionado", bump.checked);
+    bump.addEventListener("change", () => {
+      items = items.filter((item) => item.id !== bump.dataset.id);
+      if (bump.checked) items.push({
+        id: bump.dataset.id, nome: bump.dataset.nome, imagem: bump.dataset.imagem,
+        precoPix: Number(bump.dataset.preco), quantidade: 1,
+      });
+      oferta.classList.toggle("selecionado", bump.checked);
+      atualizarResumo();
+    });
+    });
+  }
 
   function activateStep(number) {
     document.querySelectorAll(".etapa").forEach((section) => {
@@ -101,13 +124,13 @@
   document.getElementById("form-checkout").onsubmit = async (event) => {
     event.preventDefault();
     if (!document.querySelector('.etapa[data-step="3"]').classList.contains("ativa")) return;
-    error.style.display = "none"; button.disabled = true; button.textContent = "Criando pedido...";
+    error.style.display = "none"; button.disabled = true; bumps.forEach((bump) => { bump.disabled = true; }); button.textContent = "Criando pedido...";
     const f = event.target;
     const cliente = { nome: f.nome.value.trim(), cpf: f.cpf.value, email: f.email.value.trim(), telefone: f.telefone.value };
     const endereco = { cep: f.cep.value, rua: f.rua.value.trim(), numero: f.numero.value.trim(), complemento: f.complemento.value.trim(), bairro: f.bairro.value.trim(), cidade: f.cidade.value.trim(), uf: f.uf.value };
     const attribution = window.CasaMarisolAttribution?.collect() || {};
     const clickId = attribution.click_id || null;
     try { const response = await fetch("/api/pedidos", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ cliente, endereco, itens: items, clickId, attribution }) }); const data = await response.json(); if (!response.ok) throw new Error(data.erro || "Não foi possível gerar o pagamento."); cart.limparCarrinho(); showPix(data); }
-    catch (err) { error.textContent = err.message; error.style.display = "block"; button.disabled = false; button.textContent = "Confirmar pedido"; }
+    catch (err) { error.textContent = err.message; error.style.display = "block"; button.disabled = false; bumps.forEach((bump) => { bump.disabled = false; }); button.textContent = "Confirmar pedido"; }
   };
 })();

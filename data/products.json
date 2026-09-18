@@ -1,5 +1,27 @@
 [
   {
+    "id": "ORDERBUMP-PRATOS-OXFORD-RYO",
+    "slug": "jogo-jantar-10-pecas-oxford-ryo-maresia",
+    "nome": "Jogo de Jantar 10 Peças Oxford Ryo Maresia",
+    "marca": "Oxford",
+    "orderBump": true,
+    "precoDe": 189.9,
+    "precoPix": 46.2,
+    "estoque": 1,
+    "imagens": ["/images/panela de pressão/pratos.jpg"]
+  },
+  {
+    "id": "ORDERBUMP-PANELA-VANCOUVER-45L",
+    "slug": "panela-pressao-tramontina-vancouver-effect-vermelha-45l",
+    "nome": "Panela de Pressão 4,5 L Tramontina Vancouver Effect Vermelho",
+    "marca": "Tramontina",
+    "orderBump": true,
+    "precoDe": 216.34,
+    "precoPix": 56.45,
+    "estoque": 1,
+    "imagens": ["/images/panela de pressão/img01.webp"]
+  },
+  {
     "id": "16069manteiga",
     "slug": "kit-10-potes",
     "nome": "Kit 10 Potes Vidro Hermetico Marmita Fitness Com Tampa Quatro Travas Retangular Anti Vazamento",

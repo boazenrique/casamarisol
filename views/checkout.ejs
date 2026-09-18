@@ -28,6 +28,26 @@
           </div>
         </section>
 
+        <% if (orderBumps.length) { %>
+          <section class="checkout-card order-bumps" id="order-bumps" aria-labelledby="ofertas-titulo" hidden>
+            <h2 id="ofertas-titulo">Adicione essas ofertas na sua compra</h2>
+            <p class="order-bumps-subtitulo">Complete seu pedido com preços especiais</p>
+            <div class="order-bumps-lista">
+              <% orderBumps.forEach((produto) => { %>
+                <label class="order-bump-produto">
+                  <input type="checkbox" class="adicionar-order-bump" data-id="<%= produto.id %>" data-nome="<%= produto.nome %>" data-imagem="<%= produto.imagens[0] %>" data-preco="<%= produto.precoPix %>" aria-label="Adicionar <%= produto.nome %> por <%= produto.precoPix.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) %>">
+                  <img src="<%= produto.imagens[0] %>" alt="<%= produto.nome %>" width="110" height="110">
+                  <span class="order-bump-detalhes">
+                    <strong class="order-bump-nome"><%= produto.nome %></strong>
+                    <span class="order-bump-preco-antigo"><b class="order-bump-desconto">-<%= Math.round((1 - produto.precoPix / produto.precoDe) * 100) %>%</b><del><%= produto.precoDe.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) %></del></span>
+                    <strong class="order-bump-preco"><%= produto.precoPix.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) %></strong>
+                  </span>
+                </label>
+              <% }); %>
+            </div>
+          </section>
+        <% } %>
+
         <section class="checkout-card etapa bloqueada" data-step="2">
           <header class="etapa-titulo"><span>2</span><div><h2>Entrega</h2><p>Preencha o endereço onde deseja receber.</p></div><i class="fa-solid fa-check etapa-check"></i></header>
           <div class="etapa-conteudo">
