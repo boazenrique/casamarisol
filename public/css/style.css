@@ -1392,7 +1392,7 @@ input:focus, select:focus { outline: none; border-color: var(--azul); }
   .checkout-shell { padding:0 12px;margin-top:14px; }
   .checkout-fluxo,.checkout-lateral { display:contents; }
   .resumo-novo { order:1; }
-  .order-bumps { grid-column:1;grid-row:auto;order:3;padding:16px;border-radius:16px; }
+  .order-bumps { grid-column:1;grid-row:auto;order:2;padding:16px;border-radius:16px; }
   .order-bumps h2 { font-size:19px; }
   .order-bumps-subtitulo { font-size:13px; }
   .order-bump-produto { grid-template-columns:22px 72px minmax(0,1fr);gap:9px;padding:12px; }
@@ -1401,7 +1401,7 @@ input:focus, select:focus { outline: none; border-color: var(--azul); }
   .order-bump-nome { font-size:13px; }
   .order-bump-preco { font-size:20px; }
   .order-bump-preco-antigo del,.order-bump-desconto { font-size:12px; }
-  .etapa[data-step="1"] { grid-column:1;grid-row:auto;order:2; }
+  .etapa[data-step="1"] { grid-column:1;grid-row:auto;order:3; }
   .etapa[data-step="2"] { grid-column:1;grid-row:auto;order:4; }
   .etapa[data-step="3"] { grid-column:1;grid-row:auto;order:5; }
   .garantias { order:6; }
