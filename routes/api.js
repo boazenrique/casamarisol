@@ -5,7 +5,6 @@ const orderStore = require("../lib/orderStore");
 const { getPixProvider } = require("../lib/pixProvider");
 const { normalizeAttribution } = require("../lib/attribution");
 const { processarPedidoAprovado } = require("../lib/rastreioExpress");
-const { createReference, readReference } = require("../lib/pixReference");
 
 function gerarIdPedido() {
   const carimbo = Date.now().toString(36).toUpperCase();
@@ -90,7 +89,6 @@ router.post("/pedidos", async (req, res) => {
       valor: Number(total.toFixed(2)),
       descricao: `Pedido ${id} - Casa Marisol`,
       cliente,
-      endereco,
       clickId: attribution.click_id || null,
       attribution,
     });
@@ -107,7 +105,6 @@ router.post("/pedidos", async (req, res) => {
       clickId: attribution.click_id || null,
       attribution,
     };
-    pagamento.provider ||= (process.env.PIX_PROVIDER || "mock").toLowerCase();
 
     try {
       // Cache local opcional (não disponível em hospedagens serverless
@@ -123,8 +120,6 @@ router.post("/pedidos", async (req, res) => {
       id: pedido.id,
       status: pedido.status,
       total: pedido.total,
-      referenciaPix: pagamento.provider === "tiggerpay"
-        ? createReference(pedido.id, pagamento.providerChargeId) : undefined,
       pagamento: {
         tipo: "pix",
         copiaECola: pagamento.copiaECola,
@@ -151,15 +146,10 @@ router.get("/pedidos/:id/status", async (req, res) => {
   }
 
   try {
-    const referenceId = readReference(req.query.referencia, req.params.id);
-    if (req.query.referencia && !referenceId) {
-      return res.status(400).json({ erro: "Referencia de pagamento invalida." });
-    }
-    const provider = getPixProvider((referenceId ? "tiggerpay" : pedido?.pagamento?.provider) ||
-      (pedido ? (pedido.pagamento.ambiente === "teste" ? "mock" : "zuckpay") : undefined));
+    const provider = getPixProvider();
     if (typeof provider.getStatus === "function") {
       const statusRemoto = await provider.getStatus({
-        transactionId: referenceId || pedido?.pagamento?.providerChargeId,
+        transactionId: pedido?.pagamento?.providerChargeId,
         externalId: req.params.id,
       });
       if (statusRemoto) {
@@ -213,22 +203,7 @@ router.post("/pedidos/:id/simular-pagamento", async (req, res) => {
 // como { event, platform, transaction: { external_id_client, status, ... } }.
 router.post("/webhooks/pix", express.json(), async (req, res) => {
   const payload = req.body || {};
-  if (payload.txid && payload.evento === "paid") {
-    try {
-      const pedido = orderStore.readAll().find((order) =>
-        order.pagamento?.provider === "tiggerpay" && order.pagamento.providerChargeId === payload.txid);
-      if (!pedido) return res.sendStatus(200);
-      const provider = getPixProvider("tiggerpay");
-      if (await provider.verifyPaidSale(payload.txid, pedido.total)) {
-        orderStore.update(pedido.id, { status: "pago" });
-        await processarPedidoAprovado(pedido);
-      }
-      return res.sendStatus(200);
-    } catch (err) {
-      console.warn("Falha ao verificar webhook TiggerPay:", err.message);
-      return res.sendStatus(503);
-    }
-  }
+  console.log("Webhook Pix recebido:", JSON.stringify(payload));
 
   const transacao = payload.transaction || payload;
   const pedidoId = transacao.external_id_client || transacao.external_id;
@@ -240,9 +215,7 @@ router.post("/webhooks/pix", express.json(), async (req, res) => {
     // diretamente pelo external_id_client.
     try {
       const pedido = orderStore.findById(pedidoId);
-      if (pedido && (!pedido.pagamento.provider || pedido.pagamento.provider === "zuckpay") &&
-          pedido.pagamento.ambiente !== "teste" &&
-          await getPixProvider("zuckpay").getStatus({ transactionId: pedido.pagamento.providerChargeId, externalId: pedido.id }) === "pago") {
+      if (pedido) {
         if (pedido.status !== "pago") {
           orderStore.update(pedido.id, { status: "pago" });
         }
