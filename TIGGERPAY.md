@@ -14,17 +14,27 @@ A criacao usa `/create-pix-duck`, valor em centavos e os dados do cliente
 e endereco. O QR Code e gerado localmente a partir do copia e cola.
 Nao e atribuido prazo de expiracao, pois a API nao o informa.
 
-E necessario armazenamento persistente e gravavel de `data/orders.json`:
-a TiggerPay consulta por txid, sem busca documentada pelo ID interno do pedido.
-O armazenamento atual em JSON e adequado apenas ao processo unico existente;
-para multiplas instancias/serverless, migrar para banco compartilhado antes de usar.
+O checkout permite criar e consultar Pix em hospedagem com arquivos somente
+leitura. A resposta inclui uma referencia assinada que vincula pedido e txid;
+o navegador envia essa referencia na consulta e o servidor valida a assinatura
+antes de consultar a TiggerPay. A chave nunca e enviada ao navegador.
+Trocar a chave invalida referencias emitidas anteriormente.
+
+Para historico local, processamento de webhook e Rastreio Express, ainda e
+necessario armazenamento persistente: o JSON atual serve ao processo unico;
+multiplas instancias/serverless precisam de banco compartilhado. Sem esse banco,
+o Pix funciona no checkout aberto, mas essas operacoes posteriores nao estao
+garantidas e a pagina `/pagamento/:id` depende do registro local.
+
+Na Vercel, configure as variaveis no ambiente do deploy (Production ou Preview)
+e gere novo deploy depois de salvar. O `.env` local nao e enviado pelo Git.
 Pedidos antigos continuam consultando a ZuckPay; mantenha suas credenciais
 enquanto houver pagamentos pendentes nela.
 
 A antiga notificacao direta ZuckPay -> Dracofy nao existe no contrato TiggerPay.
 Configure e valide as integracoes de conversao no painel do novo gateway.
 Nenhum product_id e inferido dos IDs do catalogo local.
-O Rastreio Express continua sendo acionado pela confirmacao do pagamento.
+O Rastreio Express depende do pedido salvo ao confirmar o pagamento.
 
 Validacao automatizada: `node --test tests/*.test.js` (APIs simuladas).
 Validacao real ainda exige gerar e pagar um Pix e conferir a notificacao

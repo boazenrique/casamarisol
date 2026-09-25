@@ -118,7 +118,9 @@
     document.querySelector(".checkout-colunas").setAttribute("inert", "");
     document.getElementById("checkout-pix").hidden = false;
     document.body.style.overflow = "hidden";
-    timer = setInterval(async () => { try { const response = await fetch(`/api/pedidos/${encodeURIComponent(data.id)}/status`); if (response.ok) paid((await response.json()).status); } catch (_) {} }, 4000);
+    const statusUrl = `/api/pedidos/${encodeURIComponent(data.id)}/status` +
+      (data.referenciaPix ? `?referencia=${encodeURIComponent(data.referenciaPix)}` : "");
+    timer = setInterval(async () => { try { const response = await fetch(statusUrl); if (response.ok) paid((await response.json()).status); } catch (_) {} }, 4000);
   }
   document.getElementById("btn-copiar-pix").onclick = async (event) => { const field = document.getElementById("pix-copia-cola"); try { await navigator.clipboard.writeText(field.value); } catch (_) { field.select(); document.execCommand("copy"); } event.currentTarget.textContent = "Copiado!"; setTimeout(() => event.currentTarget.textContent = "Copiar", 1800); };
   document.getElementById("form-checkout").onsubmit = async (event) => {

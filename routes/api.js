@@ -5,6 +5,7 @@ const orderStore = require("../lib/orderStore");
 const { getPixProvider } = require("../lib/pixProvider");
 const { normalizeAttribution } = require("../lib/attribution");
 const { processarPedidoAprovado } = require("../lib/rastreioExpress");
+const { createReference, readReference } = require("../lib/pixReference");
 
 function gerarIdPedido() {
   const carimbo = Date.now().toString(36).toUpperCase();
@@ -84,9 +85,6 @@ router.post("/pedidos", async (req, res) => {
 
     const id = gerarIdPedido();
     const provider = getPixProvider();
-    if ((process.env.PIX_PROVIDER || "mock").toLowerCase() === "tiggerpay") {
-      orderStore.assertWritable();
-    }
     const pagamento = await provider.createCharge({
       orderId: id,
       valor: Number(total.toFixed(2)),
@@ -118,7 +116,6 @@ router.post("/pedidos", async (req, res) => {
       // pelo external_id_client, então isso não é essencial.
       orderStore.create(pedido);
     } catch (err) {
-      if (pagamento.provider === "tiggerpay") throw new Error("Nao foi possivel salvar a referencia do pagamento TiggerPay.");
       console.warn("Aviso: não foi possível salvar o pedido localmente:", err.message);
     }
 
@@ -126,6 +123,8 @@ router.post("/pedidos", async (req, res) => {
       id: pedido.id,
       status: pedido.status,
       total: pedido.total,
+      referenciaPix: pagamento.provider === "tiggerpay"
+        ? createReference(pedido.id, pagamento.providerChargeId) : undefined,
       pagamento: {
         tipo: "pix",
         copiaECola: pagamento.copiaECola,
@@ -152,11 +151,15 @@ router.get("/pedidos/:id/status", async (req, res) => {
   }
 
   try {
-    const provider = getPixProvider(pedido?.pagamento?.provider ||
+    const referenceId = readReference(req.query.referencia, req.params.id);
+    if (req.query.referencia && !referenceId) {
+      return res.status(400).json({ erro: "Referencia de pagamento invalida." });
+    }
+    const provider = getPixProvider((referenceId ? "tiggerpay" : pedido?.pagamento?.provider) ||
       (pedido ? (pedido.pagamento.ambiente === "teste" ? "mock" : "zuckpay") : undefined));
     if (typeof provider.getStatus === "function") {
       const statusRemoto = await provider.getStatus({
-        transactionId: pedido?.pagamento?.providerChargeId,
+        transactionId: referenceId || pedido?.pagamento?.providerChargeId,
         externalId: req.params.id,
       });
       if (statusRemoto) {
