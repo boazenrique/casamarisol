@@ -84,11 +84,15 @@ router.post("/pedidos", async (req, res) => {
 
     const id = gerarIdPedido();
     const provider = getPixProvider();
+    if ((process.env.PIX_PROVIDER || "mock").toLowerCase() === "tiggerpay") {
+      orderStore.assertWritable();
+    }
     const pagamento = await provider.createCharge({
       orderId: id,
       valor: Number(total.toFixed(2)),
       descricao: `Pedido ${id} - Casa Marisol`,
       cliente,
+      endereco,
       clickId: attribution.click_id || null,
       attribution,
     });
@@ -105,6 +109,7 @@ router.post("/pedidos", async (req, res) => {
       clickId: attribution.click_id || null,
       attribution,
     };
+    pagamento.provider ||= (process.env.PIX_PROVIDER || "mock").toLowerCase();
 
     try {
       // Cache local opcional (não disponível em hospedagens serverless
@@ -113,6 +118,7 @@ router.post("/pedidos", async (req, res) => {
       // pelo external_id_client, então isso não é essencial.
       orderStore.create(pedido);
     } catch (err) {
+      if (pagamento.provider === "tiggerpay") throw new Error("Nao foi possivel salvar a referencia do pagamento TiggerPay.");
       console.warn("Aviso: não foi possível salvar o pedido localmente:", err.message);
     }
 
@@ -146,7 +152,8 @@ router.get("/pedidos/:id/status", async (req, res) => {
   }
 
   try {
-    const provider = getPixProvider();
+    const provider = getPixProvider(pedido?.pagamento?.provider ||
+      (pedido ? (pedido.pagamento.ambiente === "teste" ? "mock" : "zuckpay") : undefined));
     if (typeof provider.getStatus === "function") {
       const statusRemoto = await provider.getStatus({
         transactionId: pedido?.pagamento?.providerChargeId,
@@ -203,7 +210,22 @@ router.post("/pedidos/:id/simular-pagamento", async (req, res) => {
 // como { event, platform, transaction: { external_id_client, status, ... } }.
 router.post("/webhooks/pix", express.json(), async (req, res) => {
   const payload = req.body || {};
-  console.log("Webhook Pix recebido:", JSON.stringify(payload));
+  if (payload.txid && payload.evento === "paid") {
+    try {
+      const pedido = orderStore.readAll().find((order) =>
+        order.pagamento?.provider === "tiggerpay" && order.pagamento.providerChargeId === payload.txid);
+      if (!pedido) return res.sendStatus(200);
+      const provider = getPixProvider("tiggerpay");
+      if (await provider.verifyPaidSale(payload.txid, pedido.total)) {
+        orderStore.update(pedido.id, { status: "pago" });
+        await processarPedidoAprovado(pedido);
+      }
+      return res.sendStatus(200);
+    } catch (err) {
+      console.warn("Falha ao verificar webhook TiggerPay:", err.message);
+      return res.sendStatus(503);
+    }
+  }
 
   const transacao = payload.transaction || payload;
   const pedidoId = transacao.external_id_client || transacao.external_id;
@@ -215,7 +237,9 @@ router.post("/webhooks/pix", express.json(), async (req, res) => {
     // diretamente pelo external_id_client.
     try {
       const pedido = orderStore.findById(pedidoId);
-      if (pedido) {
+      if (pedido && (!pedido.pagamento.provider || pedido.pagamento.provider === "zuckpay") &&
+          pedido.pagamento.ambiente !== "teste" &&
+          await getPixProvider("zuckpay").getStatus({ transactionId: pedido.pagamento.providerChargeId, externalId: pedido.id }) === "pago") {
         if (pedido.status !== "pago") {
           orderStore.update(pedido.id, { status: "pago" });
         }
