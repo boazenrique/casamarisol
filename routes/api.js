@@ -2,9 +2,21 @@ const express = require("express");
 const router = express.Router();
 const produtos = require("../lib/products");
 const orderStore = require("../lib/orderStore");
-const { getPixProvider } = require("../lib/pixProvider");
+const { getPixProvider, FrendzPixProvider } = require("../lib/pixProvider");
 const { normalizeAttribution } = require("../lib/attribution");
 const { processarPedidoAprovado } = require("../lib/rastreioExpress");
+const { notificarDracofy } = require("../lib/dracofy");
+
+function providerDoPedido(pedido) {
+  if (!pedido) return undefined;
+  return pedido.pagamento?.provider || (pedido.pagamento?.ambiente === "teste" ? "mock" : "zuckpay");
+}
+
+async function processarConfirmacao(pedido) {
+  if (pedido.status !== "pago" || pedido.testeIntegracao) return;
+  if (pedido.pagamento?.provider === "frendz") await notificarDracofy(pedido);
+  await processarPedidoAprovado(pedido);
+}
 
 function gerarIdPedido() {
   const carimbo = Date.now().toString(36).toUpperCase();
@@ -84,11 +96,18 @@ router.post("/pedidos", async (req, res) => {
 
     const id = gerarIdPedido();
     const provider = getPixProvider();
+    if (provider instanceof FrendzPixProvider) {
+      // A consulta Frendz exige o hash retornado ao criar a transacao.
+      // Nao criar cobrancas em hospedagens sem armazenamento local gravavel.
+      orderStore.assertWritable();
+    }
     const pagamento = await provider.createCharge({
       orderId: id,
       valor: Number(total.toFixed(2)),
       descricao: `Pedido ${id} - Casa Marisol`,
       cliente,
+      endereco,
+      itens: itensValidados,
       clickId: attribution.click_id || null,
       attribution,
     });
@@ -107,12 +126,11 @@ router.post("/pedidos", async (req, res) => {
     };
 
     try {
-      // Cache local opcional (não disponível em hospedagens serverless
-      // como a Vercel, cujo sistema de arquivos é somente leitura). O
-      // status do pagamento sempre pode ser reconsultado na ZuckPay
-      // pelo external_id_client, então isso não é essencial.
+      // Frendz exige persistir o hash remoto para consultas posteriores.
+      // O fallback sem disco por external_id_client e exclusivo da ZuckPay.
       orderStore.create(pedido);
     } catch (err) {
+      if (pagamento.provider === "frendz") throw new Error("Falha ao salvar o pedido Frendz. Consulte a transacao no painel antes de repetir.");
       console.warn("Aviso: não foi possível salvar o pedido localmente:", err.message);
     }
 
@@ -132,7 +150,6 @@ router.post("/pedidos", async (req, res) => {
     console.error("Erro ao criar pedido:", err);
     res.status(500).json({
       erro: "Não foi possível gerar o pagamento Pix. Tente novamente.",
-      detalhe: err.message,
     });
   }
 });
@@ -146,11 +163,12 @@ router.get("/pedidos/:id/status", async (req, res) => {
   }
 
   try {
-    const provider = getPixProvider();
+    const provider = getPixProvider(providerDoPedido(pedido));
     if (typeof provider.getStatus === "function") {
       const statusRemoto = await provider.getStatus({
         transactionId: pedido?.pagamento?.providerChargeId,
         externalId: req.params.id,
+        valor: pedido?.total,
       });
       if (statusRemoto) {
         if (pedido) {
@@ -159,13 +177,13 @@ router.get("/pedidos/:id/status", async (req, res) => {
               orderStore.update(pedido.id, { status: statusRemoto });
             }
             // Chamado em toda consulta com status "pago" (não só na primeira
-            // transição): confirmação real vinda da própria ZuckPay. A
+            // transição): confirmação real vinda da API do provedor. A
             // idempotência/retry fica a cargo de processarPedidoAprovado, que
             // relê o pedido e reprocessa com segurança uma tentativa anterior
             // que tenha falhado (ex.: Rastreio Express fora do ar).
             if (statusRemoto === "pago") {
-              // Dracofy receives payment confirmation directly from ZuckPay.
-              await processarPedidoAprovado(pedido);
+              // Frendz envia conversao pelo backend; ZuckPay usa callback direto.
+              await processarConfirmacao({ ...pedido, status: "pago" });
             }
           } catch (err) {
             console.warn(`Falha ao processar confirmação do pedido ${pedido.id}:`, err.message);
@@ -203,7 +221,6 @@ router.post("/pedidos/:id/simular-pagamento", async (req, res) => {
 // como { event, platform, transaction: { external_id_client, status, ... } }.
 router.post("/webhooks/pix", express.json(), async (req, res) => {
   const payload = req.body || {};
-  console.log("Webhook Pix recebido:", JSON.stringify(payload));
 
   const transacao = payload.transaction || payload;
   const pedidoId = transacao.external_id_client || transacao.external_id;
@@ -215,7 +232,11 @@ router.post("/webhooks/pix", express.json(), async (req, res) => {
     // diretamente pelo external_id_client.
     try {
       const pedido = orderStore.findById(pedidoId);
-      if (pedido) {
+      if (pedido && providerDoPedido(pedido) === "zuckpay") {
+        const statusConfirmado = await getPixProvider("zuckpay").getStatus({
+          transactionId: pedido.pagamento?.providerChargeId, externalId: pedido.id,
+        });
+        if (statusConfirmado !== "pago") return res.sendStatus(200);
         if (pedido.status !== "pago") {
           orderStore.update(pedido.id, { status: "pago" });
         }
@@ -235,6 +256,29 @@ router.post("/webhooks/pix", express.json(), async (req, res) => {
   }
 
   res.sendStatus(200);
+});
+
+// O postback e apenas um aviso: o status, valor e identificador sao conferidos
+// na API autenticada antes de qualquer confirmacao ou envio de conversao.
+router.post("/webhooks/frendz", async (req, res) => {
+  if (typeof req.query.pedido !== "string") return res.sendStatus(400);
+  try {
+    const pedido = orderStore.findById(req.query.pedido);
+    // Solicita nova entrega se a criacao do pedido ainda estiver em andamento.
+    if (!pedido) return res.sendStatus(503);
+    if (providerDoPedido(pedido) !== "frendz") return res.sendStatus(400);
+    const status = await getPixProvider("frendz").getStatus({
+      transactionId: pedido.pagamento.providerChargeId, valor: pedido.total,
+    });
+    if (status) {
+      if (pedido.status !== status) orderStore.update(pedido.id, { status });
+      if (status === "pago") await processarConfirmacao({ ...pedido, status });
+    }
+    return res.sendStatus(200);
+  } catch (_) {
+    console.warn("Frendz: nao foi possivel verificar a notificacao de pagamento.");
+    return res.sendStatus(503);
+  }
 });
 
 module.exports = router;
