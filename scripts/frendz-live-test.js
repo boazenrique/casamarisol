@@ -9,7 +9,7 @@ async function main() {
   if (!process.argv.includes("--authorized")) throw new Error("Teste real exige --authorized.");
   const token = process.env.FRENDZ_API_TOKEN;
   if (!token) throw new Error("Token ausente.");
-  store.assertWritable();
+  await store.assertWritable();
   const id = `CM-TESTE-FRENDZ-${Date.now()}`;
   const cliente = { nome: "Teste Integracao Casa Marisol", email: "teste@example.invalid" };
   const valor = 5; // Minimo confirmado pela resposta HTTP 400 da Frendz.
@@ -36,7 +36,7 @@ async function main() {
   if (!response.ok) { process.exitCode = 1; return; }
   const data = JSON.parse(raw);
   const charge = await new FrendzPixProvider().parseCharge(data.data || data);
-  store.create({ id, criadoEm: new Date().toISOString(), cliente, endereco: {}, itens, total: valor,
+  await store.create({ id, criadoEm: new Date().toISOString(), cliente, endereco: {}, itens, total: valor,
     status: "pendente", pagamento: charge, testeIntegracao: true });
   console.log("Hash e Pix salvos no pedido de teste. Nenhum pagamento foi realizado.");
 }

@@ -77,10 +77,11 @@ testes automatizados e não deve ser repetido automaticamente após erro de rede
 - Resolver com a Frendz o erro de processamento HTTP 400 e obter uma resposta
   de criação bem-sucedida; validar os campos usados pelo parser.
 - Publicar o backend no domínio informado para receber o postback.
-- Confirmar armazenamento persistente e compartilhado dos pedidos. O
-  `orderStore` atual usa `data/orders.json`, adequado somente a uma instância
-  com disco persistente. Discos temporários/serverless e múltiplas instâncias
-  exigem migrar esse armazenamento antes de ativar.
+- Conectar Postgres ao projeto Vercel e disponibilizar `DATABASE_URL` ou
+  `POSTGRES_URL`. O backend cria a tabela `casa_marisol_orders` na primeira
+  conexão (a credencial precisa de permissão para criá-la). Fora da Vercel,
+  sem banco configurado, o armazenamento local em `data/orders.json` continua.
+  Pedidos existentes nesse JSON não são importados automaticamente no banco.
 - Definir `FRENDZ_API_TOKEN` e `PIX_PROVIDER=frendz` no ambiente do servidor
   e reiniciar a aplicação. Validar também a confirmação de um pagamento real.
 
@@ -91,3 +92,31 @@ testes automatizados e não deve ser repetido automaticamente após erro de rede
 Usam respostas simuladas, sem token real, sem chamadas de criação em produção.
 Cobrem payload, hashes, centavos, QR Code, persistência do identificador,
 resposta segura ao frontend e confirmação verificada no backend.
+
+## Correção para Vercel e diagnóstico
+
+O filesystem da aplicação na Vercel é somente leitura. O antigo teste de escrita
+antes de chamar a Frendz podia encerrar a criação do pedido com HTTP 500.
+Agora a Vercel exige Postgres e todas as operações de pedidos aguardam o banco.
+As confirmações usam trava transacional por pedido para serializar os efeitos
+entre instâncias. O teste SQL usa PostgreSQL embarcado (PGlite); a conexão com
+o banco do projeto só pode ser validada depois de configurar a variável.
+
+Para configurar: Vercel → projeto → Storage/Marketplace → Neon/Postgres →
+conectar ao projeto em Production. Confirme `DATABASE_URL` nas variáveis de
+ambiente, mantenha `FRENDZ_API_TOKEN` e `PIX_PROVIDER=frendz`, e faça Redeploy.
+Não use prefixos públicos para credenciais.
+
+`POST /api/pedidos` retorna uma referência que também aparece nos logs, sem
+gravar token ou dados do comprador. Códigos relevantes:
+
+- `ORDER_STORAGE_NOT_CONFIGURED` (503): falta a conexão Postgres na Vercel.
+- `ORDER_STORAGE_ERROR` (503): falha de conexão, esquema ou gravação do pedido.
+- `FRENDZ_NOT_CONFIGURED` (503): falta o token no ambiente do servidor.
+- `FRENDZ_HTTP_ERROR` (502): a API Frendz recusou a requisição; o HTTP de origem
+  aparece como `providerStatus` nos logs.
+- `FRENDZ_NETWORK_ERROR` (502): não foi possível concluir a chamada à Frendz.
+
+Falhas no banco durante consulta não viram mais "pedido não encontrado" (404).
+`/favicon.ico` redireciona para o ícone PNG existente. A URL do outro 404
+relatado pelo usuário precisa ser confirmada se não for o favicon.

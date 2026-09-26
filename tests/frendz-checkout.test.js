@@ -11,8 +11,8 @@ test("checkout conserva itens locais, salva transaction_hash e responde apenas c
   let saved;
   let writeChecked = false;
   process.env.PIX_PROVIDER = "frendz";
-  store.assertWritable = () => { writeChecked = true; };
-  store.create = (order) => { saved = order; return order; };
+  store.assertWritable = async () => { await Promise.resolve(); writeChecked = true; };
+  store.create = async (order) => { await Promise.resolve(); saved = order; return order; };
   FrendzPixProvider.prototype.createCharge = async (input) => {
     assert.equal(writeChecked, true);
     assert.equal(input.valor, Number(product.precoPix));

@@ -9,6 +9,8 @@ const LOJA = {
   freteGratisAcima: 399,
 };
 
+router.get("/favicon.ico", (req, res) => res.redirect(302, "/images/logo.png"));
+
 router.get("/", (req, res) => {
   res.render("index", { loja: LOJA, produtos: produtos.listar() });
 });
@@ -28,10 +30,14 @@ router.get("/checkout", (req, res) => {
   res.render("checkout", { loja: LOJA, orderBumps: produtos.buscarOrderBump() });
 });
 
-router.get("/pagamento/:id", (req, res) => {
-  const pedido = orderStore.findById(req.params.id);
-  if (!pedido) return res.status(404).render("404", { loja: LOJA });
-  res.render("pagamento", { loja: LOJA, pedido });
+router.get("/pagamento/:id", async (req, res, next) => {
+  try {
+    const pedido = await orderStore.findById(req.params.id);
+    if (!pedido) return res.status(404).render("404", { loja: LOJA });
+    res.render("pagamento", { loja: LOJA, pedido });
+  } catch (_) {
+    res.status(503).send("Nao foi possivel consultar o pedido agora. Tente novamente em instantes.");
+  }
 });
 
 module.exports = router;

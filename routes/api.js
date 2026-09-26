@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const { randomUUID } = require("node:crypto");
 const produtos = require("../lib/products");
 const orderStore = require("../lib/orderStore");
 const { getPixProvider, FrendzPixProvider } = require("../lib/pixProvider");
@@ -14,8 +15,12 @@ function providerDoPedido(pedido) {
 
 async function processarConfirmacao(pedido) {
   if (pedido.status !== "pago" || pedido.testeIntegracao) return;
-  if (pedido.pagamento?.provider === "frendz") await notificarDracofy(pedido);
-  await processarPedidoAprovado(pedido);
+  await orderStore.withOrderLock(pedido.id, async () => {
+    const current = await orderStore.findById(pedido.id);
+    if (!current || current.status !== "pago" || current.testeIntegracao) return;
+    if (current.pagamento?.provider === "frendz") await notificarDracofy(current);
+    await processarPedidoAprovado(current);
+  });
 }
 
 function gerarIdPedido() {
@@ -48,6 +53,7 @@ router.post("/carrinho/validar", (req, res) => {
 });
 
 router.post("/pedidos", async (req, res) => {
+  let etapa = "validacao";
   try {
     const { cliente, endereco, itens, clickId } = req.body;
     const attribution = normalizeAttribution(req.body.attribution, clickId);
@@ -98,9 +104,11 @@ router.post("/pedidos", async (req, res) => {
     const provider = getPixProvider();
     if (provider instanceof FrendzPixProvider) {
       // A consulta Frendz exige o hash retornado ao criar a transacao.
-      // Nao criar cobrancas em hospedagens sem armazenamento local gravavel.
-      orderStore.assertWritable();
+      // Confere o Postgres na Vercel ou o disco no ambiente local.
+      etapa = "armazenamento";
+      await orderStore.assertWritable();
     }
+    etapa = "gateway";
     const pagamento = await provider.createCharge({
       orderId: id,
       valor: Number(total.toFixed(2)),
@@ -126,9 +134,10 @@ router.post("/pedidos", async (req, res) => {
     };
 
     try {
+      etapa = "salvar_pedido";
       // Frendz exige persistir o hash remoto para consultas posteriores.
       // O fallback sem disco por external_id_client e exclusivo da ZuckPay.
-      orderStore.create(pedido);
+      await orderStore.create(pedido);
     } catch (err) {
       if (pagamento.provider === "frendz") throw new Error("Falha ao salvar o pedido Frendz. Consulte a transacao no painel antes de repetir.");
       console.warn("Aviso: não foi possível salvar o pedido localmente:", err.message);
@@ -147,9 +156,16 @@ router.post("/pedidos", async (req, res) => {
       },
     });
   } catch (err) {
-    console.error("Erro ao criar pedido:", err);
-    res.status(500).json({
-      erro: "Não foi possível gerar o pagamento Pix. Tente novamente.",
+    const referencia = randomUUID();
+    const codigo = err.code === "ORDER_STORAGE_NOT_CONFIGURED" ? err.code :
+      etapa === "armazenamento" || etapa === "salvar_pedido" ? "ORDER_STORAGE_ERROR" :
+      ["FRENDZ_NOT_CONFIGURED", "FRENDZ_NETWORK_ERROR", "FRENDZ_HTTP_ERROR"].includes(err.code) ? err.code : "ORDER_CREATE_ERROR";
+    console.error("Falha ao criar pedido", { referencia, etapa, codigo, providerStatus: err.providerStatus });
+    const status = codigo.startsWith("ORDER_STORAGE") || codigo === "FRENDZ_NOT_CONFIGURED" ? 503 :
+      codigo.startsWith("FRENDZ_") ? 502 : 500;
+    res.status(status).json({
+      erro: `Não foi possível gerar o pagamento Pix. Referência: ${referencia}`,
+      codigo, referencia,
     });
   }
 });
@@ -157,9 +173,9 @@ router.post("/pedidos", async (req, res) => {
 router.get("/pedidos/:id/status", async (req, res) => {
   let pedido = null;
   try {
-    pedido = orderStore.findById(req.params.id);
+    pedido = await orderStore.findById(req.params.id);
   } catch (_) {
-    // sem cache local disponível (ex.: Vercel) — segue direto pra ZuckPay.
+    return res.status(503).json({ erro: "Não foi possível consultar o pedido agora.", codigo: "ORDER_STORAGE_ERROR" });
   }
 
   try {
@@ -174,7 +190,7 @@ router.get("/pedidos/:id/status", async (req, res) => {
         if (pedido) {
           try {
             if (pedido.status !== statusRemoto) {
-              orderStore.update(pedido.id, { status: statusRemoto });
+              await orderStore.update(pedido.id, { status: statusRemoto });
             }
             // Chamado em toda consulta com status "pago" (não só na primeira
             // transição): confirmação real vinda da API do provedor. A
@@ -205,16 +221,20 @@ router.get("/pedidos/:id/status", async (req, res) => {
 // Endpoint de apoio para ambiente de teste (MockPixProvider): confirma o
 // pagamento manualmente, simulando o webhook que um gateway real enviaria.
 router.post("/pedidos/:id/simular-pagamento", async (req, res) => {
-  const pedido = orderStore.findById(req.params.id);
+  try {
+  const pedido = await orderStore.findById(req.params.id);
   if (!pedido) return res.status(404).json({ erro: "Pedido não encontrado." });
   if (pedido.pagamento.ambiente !== "teste") {
     return res.status(403).json({ erro: "Disponível apenas no ambiente de teste." });
   }
-  const atualizado = orderStore.update(pedido.id, { status: "pago" });
+  const atualizado = await orderStore.update(pedido.id, { status: "pago" });
   // Simulated payments must not send advertising conversions.
   // Simulação de pagamento (ambiente de teste) não é uma confirmação real:
   // não deve gerar rastreio no Rastreio Express (regra 1 da integração).
   res.json({ status: atualizado.status });
+  } catch (_) {
+    res.status(503).json({ erro: "Não foi possível consultar o pedido agora.", codigo: "ORDER_STORAGE_ERROR" });
+  }
 });
 
 // Ponto de entrada para o webhook da ZuckPay (urlnoty). O payload vem
@@ -231,14 +251,14 @@ router.post("/webhooks/pix", express.json(), async (req, res) => {
     // real acontece via GET /api/pedidos/:id/status, que consulta a ZuckPay
     // diretamente pelo external_id_client.
     try {
-      const pedido = orderStore.findById(pedidoId);
+      const pedido = await orderStore.findById(pedidoId);
       if (pedido && providerDoPedido(pedido) === "zuckpay") {
         const statusConfirmado = await getPixProvider("zuckpay").getStatus({
           transactionId: pedido.pagamento?.providerChargeId, externalId: pedido.id,
         });
         if (statusConfirmado !== "pago") return res.sendStatus(200);
         if (pedido.status !== "pago") {
-          orderStore.update(pedido.id, { status: "pago" });
+          await orderStore.update(pedido.id, { status: "pago" });
         }
         // Chamado em toda notificação "PAID" (inclusive webhook duplicado):
         // confirmação real vinda do webhook oficial da ZuckPay. A
@@ -246,7 +266,7 @@ router.post("/webhooks/pix", express.json(), async (req, res) => {
         // relê o pedido e reprocessa com segurança uma tentativa anterior
         // que tenha falhado (ex.: Rastreio Express fora do ar).
         // Dracofy receives payment confirmation directly from ZuckPay.
-        await processarPedidoAprovado(pedido);
+        await processarConfirmacao({ ...pedido, status: "pago" });
       } else {
         console.warn(`Webhook Pix: pedido ${pedidoId} não encontrado; atribuição indisponível.`);
       }
@@ -263,7 +283,7 @@ router.post("/webhooks/pix", express.json(), async (req, res) => {
 router.post("/webhooks/frendz", async (req, res) => {
   if (typeof req.query.pedido !== "string") return res.sendStatus(400);
   try {
-    const pedido = orderStore.findById(req.query.pedido);
+    const pedido = await orderStore.findById(req.query.pedido);
     // Solicita nova entrega se a criacao do pedido ainda estiver em andamento.
     if (!pedido) return res.sendStatus(503);
     if (providerDoPedido(pedido) !== "frendz") return res.sendStatus(400);
@@ -271,7 +291,7 @@ router.post("/webhooks/frendz", async (req, res) => {
       transactionId: pedido.pagamento.providerChargeId, valor: pedido.total,
     });
     if (status) {
-      if (pedido.status !== status) orderStore.update(pedido.id, { status });
+      if (pedido.status !== status) await orderStore.update(pedido.id, { status });
       if (status === "pago") await processarConfirmacao({ ...pedido, status });
     }
     return res.sendStatus(200);
