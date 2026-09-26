@@ -62,13 +62,15 @@ test("cria QR local e mantem token somente na chamada ao servidor Frendz", async
     assert.equal(options.method, "POST");
     assert.equal(options.redirect, "error");
     assert.equal(JSON.parse(options.body).amount, 3230);
-    // Fixture provisoria: validar com o exemplo de resposta da conta.
-    return { ok: true, json: async () => ({ data: { hash: "hash-teste", pix: { code: "pix-fixture" } } }) };
+    // Formato confirmado em GET /transactions e GET /transactions/{hash}.
+    return { ok: true, json: async () => ({ hash: "hash-teste", payment_status: "waiting_payment",
+      pix: { pix_qr_code: "000201pix-fixture", pix_url: "https://go.frendz.com.br/customer/test", qr_code_base64: null } }) };
   };
   const charge = await getPixProvider("frendz").createCharge(input());
   assert.equal(charge.providerChargeId, "hash-teste");
   assert.equal(charge.transaction_hash, "hash-teste");
   assert.equal(charge.provider, "frendz");
+  assert.equal(charge.copiaECola, "000201pix-fixture");
   assert.match(charge.qrCodeDataUrl, /^data:image\/png;base64,/);
   assert.equal(JSON.stringify(charge).includes("segredo-de-teste"), false);
 });
@@ -96,7 +98,7 @@ test("erros de rede e HTTP nao expoem token ou resposta remota", async () => {
 
 test("consulta confere hash, metodo e valor antes de aceitar pagamento", async () => {
   process.env.FRENDZ_API_TOKEN = "token";
-  let transaction = { hash: "hash", payment_method: "pix", amount: 3230, status: "paid" };
+  let transaction = { hash: "hash", payment_method: "pix", amount: 3230, payment_status: "paid" };
   global.fetch = async (url) => {
     assert.equal(url.pathname, "/api/public/v1/transactions/hash");
     return { ok: true, json: async () => ({ data: transaction }) };
@@ -105,12 +107,12 @@ test("consulta confere hash, metodo e valor antes de aceitar pagamento", async (
   const query = { transactionId: "hash", valor: 32.3 };
   assert.equal(await provider.getStatus(query), "pago");
   for (const status of ["pending", "waiting_payment", "processing"]) {
-    transaction.status = status;
+    transaction.payment_status = status;
     assert.equal(await provider.getStatus(query), "pendente");
   }
-  transaction.status = "refunded";
+  transaction.payment_status = "refunded";
   assert.equal(await provider.getStatus(query), "reembolsado");
-  transaction.status = "authorized";
+  transaction.payment_status = "authorized";
   assert.equal(await provider.getStatus(query), null);
   transaction.amount = 1;
   await assert.rejects(provider.getStatus(query), /nao corresponde/);

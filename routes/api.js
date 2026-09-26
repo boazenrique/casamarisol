@@ -159,12 +159,13 @@ router.post("/pedidos", async (req, res) => {
     const referencia = randomUUID();
     const codigo = err.code === "ORDER_STORAGE_NOT_CONFIGURED" ? err.code :
       etapa === "armazenamento" || etapa === "salvar_pedido" ? "ORDER_STORAGE_ERROR" :
-      ["FRENDZ_NOT_CONFIGURED", "FRENDZ_NETWORK_ERROR", "FRENDZ_HTTP_ERROR"].includes(err.code) ? err.code : "ORDER_CREATE_ERROR";
+      ["FRENDZ_NOT_CONFIGURED", "FRENDZ_NETWORK_ERROR", "FRENDZ_HTTP_ERROR", "FRENDZ_INVALID_RESPONSE", "FRENDZ_PIX_MISSING"].includes(err.code) ? err.code : "ORDER_CREATE_ERROR";
     console.error("Falha ao criar pedido", { referencia, etapa, codigo, providerStatus: err.providerStatus });
     const status = codigo.startsWith("ORDER_STORAGE") || codigo === "FRENDZ_NOT_CONFIGURED" ? 503 :
       codigo.startsWith("FRENDZ_") ? 502 : 500;
     res.status(status).json({
-      erro: `Não foi possível gerar o pagamento Pix. Referência: ${referencia}`,
+      erro: codigo === "FRENDZ_PIX_MISSING" ? `Não foi possível exibir o Pix. Consulte a loja antes de repetir o pedido. Referência: ${referencia}` :
+        `Não foi possível gerar o pagamento Pix. Referência: ${referencia}`,
       codigo, referencia,
     });
   }

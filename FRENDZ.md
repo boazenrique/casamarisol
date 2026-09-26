@@ -37,10 +37,12 @@ O polling do checkout consulta a mesma API como fallback. Testes de integração
 identificados como tais não acionam conversões nem rastreio.
 
 O identificador remoto fica salvo em `pagamento.transaction_hash` e
-`pagamento.providerChargeId`. O parser aceita `hash` ou `transaction_hash`,
-`pix.code`, `pix.expires_at`, `amount`, `payment_method`/`method` e `status`,
-diretamente ou sob `data`. **A resposta de sucesso ainda precisa ser validada
-com uma transação real**, pois a Frendz retornou erros nos testes autorizados.
+`pagamento.providerChargeId`. A API real foi consultada em leitura após as
+tentativas no checkout: os campos são `hash`, `pix.pix_qr_code`, `amount`,
+`payment_method` e `payment_status`. O parser usa esses campos, mantendo
+compatibilidade com `transaction_hash`, `pix.code` e `status`.
+`pix.pix_url` não é usado para redirecionar o comprador. A imagem do QR é gerada
+localmente mesmo quando `qr_code_base64` vem nulo.
 
 ## Testes reais em 26/09/2026
 
@@ -75,7 +77,10 @@ testes automatizados e não deve ser repetido automaticamente após erro de rede
 ## Pendências no ambiente publicado
 
 - Resolver com a Frendz o erro de processamento HTTP 400 e obter uma resposta
-  de criação bem-sucedida; validar os campos usados pelo parser.
+  de criação bem-sucedida no teste sem dados pessoais. As tentativas posteriores
+  do usuário já apareceram na listagem com Pix e `payment_status=waiting_payment`;
+  o parser antigo causava erro ao procurar `pix.code`. Corrigido para
+  `pix.pix_qr_code` e validado em leitura com transação existente, sem novo POST.
 - Publicar o backend no domínio informado para receber o postback.
 - Conectar Postgres ao projeto Vercel e disponibilizar `DATABASE_URL` ou
   `POSTGRES_URL`. O backend cria a tabela `casa_marisol_orders` na primeira
