@@ -1,12 +1,13 @@
 const express = require("express");
 const router = express.Router();
-const { randomUUID } = require("node:crypto");
+const { randomUUID, timingSafeEqual } = require("node:crypto");
 const produtos = require("../lib/products");
 const orderStore = require("../lib/orderStore");
 const { getPixProvider, FrendzPixProvider } = require("../lib/pixProvider");
 const { normalizeAttribution } = require("../lib/attribution");
 const { processarPedidoAprovado } = require("../lib/rastreioExpress");
 const { notificarDracofy } = require("../lib/dracofy");
+const trackio = require("../lib/trackio");
 
 function providerDoPedido(pedido) {
   if (!pedido) return undefined;
@@ -18,7 +19,10 @@ async function processarConfirmacao(pedido) {
   await orderStore.withOrderLock(pedido.id, async () => {
     const current = await orderStore.findById(pedido.id);
     if (!current || current.status !== "pago" || current.testeIntegracao) return;
-    if (current.pagamento?.provider === "frendz") await notificarDracofy(current);
+    if (current.pagamento?.provider === "frendz") {
+      await notificarDracofy(current);
+      await trackio.notificarPagamentoAprovado(current);
+    }
     await processarPedidoAprovado(current);
   });
 }
@@ -142,6 +146,10 @@ router.post("/pedidos", async (req, res) => {
       if (pagamento.provider === "frendz") throw new Error("Falha ao salvar o pedido Frendz. Consulte a transacao no painel antes de repetir.");
       console.warn("Aviso: não foi possível salvar o pedido localmente:", err.message);
     }
+
+    // Evento checkout-started ao Trackio: best-effort, nao bloqueia a
+    // resposta do checkout. Erros sao registrados dentro de trackio.js.
+    trackio.notificarCheckoutIniciado(pedido);
 
     res.status(201).json({
       id: pedido.id,
@@ -298,6 +306,84 @@ router.post("/webhooks/frendz", async (req, res) => {
     return res.sendStatus(200);
   } catch (_) {
     console.warn("Frendz: nao foi possivel verificar a notificacao de pagamento.");
+    return res.sendStatus(503);
+  }
+});
+
+function tokenValido(recebido) {
+  const esperado = process.env.FRENDZ_WEBHOOK_TOKEN?.trim();
+  if (!esperado || typeof recebido !== "string" || recebido.length !== esperado.length) return false;
+  return timingSafeEqual(Buffer.from(recebido), Buffer.from(esperado));
+}
+
+// Produto da Frendz identificado por hash (nunca pelo titulo visivel).
+function produtoReconhecido(payload) {
+  const offerHash = process.env.FRENDZ_OFFER_HASH?.trim();
+  const productHash = process.env.FRENDZ_PRODUCT_HASH?.trim();
+  const offer = payload?.offer?.hash;
+  const items = Array.isArray(payload?.items) ? payload.items : [];
+  if (offerHash && offer === offerHash) return true;
+  if (productHash && items.some((item) => item?.product_hash === productHash)) return true;
+  return false;
+}
+
+// transaction.pix.url so e usada se for uma URL publica HTTPS valida.
+function pixUrlPublica(url) {
+  if (typeof url !== "string" || !url) return undefined;
+  try {
+    return new URL(url).protocol === "https:" ? url : undefined;
+  } catch (_) {
+    return undefined;
+  }
+}
+
+// Rota dedicada ao Trackio: encaminha apenas a confirmacao de pagamento da
+// Frendz (checkout-started e enviado direto na criacao do pedido, em
+// /pedidos). Autenticada por token no path, nao pela API autenticada da
+// Frendz - por isso nunca altera o status interno do pedido, so repassa o
+// evento ao Trackio apos deduplicar por transaction.id + status.
+router.post("/frendz/webhook/:token", async (req, res) => {
+  if (!tokenValido(req.params.token)) return res.sendStatus(401);
+
+  const payload = req.body || {};
+  const transacao = payload.transaction || {};
+  const transactionId = transacao.id || transacao.hash;
+  const status = transacao.status || payload.status;
+  if (!transactionId || !status) return res.sendStatus(200);
+  if (status !== "paid") return res.sendStatus(200);
+  if (!produtoReconhecido(payload)) {
+    console.warn(`Trackio/Frendz: produto nao reconhecido para a transacao ${transactionId}.`);
+    return res.sendStatus(200);
+  }
+
+  const dedupKey = `${transactionId}:${status}`;
+  try {
+    const pedido = await orderStore.findByChargeId(transactionId);
+    if (!pedido) {
+      console.warn(`Trackio/Frendz: pedido local nao encontrado para a transacao ${transactionId}.`);
+      return res.sendStatus(200);
+    }
+
+    const customer = transacao.customer || payload.customer || {};
+    const clienteWebhook = {
+      nome: customer.name, email: customer.email, telefone: customer.phone, cpf: customer.document,
+    };
+
+    await orderStore.withOrderLock(pedido.id, async () => {
+      const current = await orderStore.findById(pedido.id);
+      if (!current || current.trackioWebhook?.ultimoEvento === dedupKey) return;
+      await orderStore.update(current.id, { trackioWebhook: { ultimoEvento: dedupKey, recebidoEm: new Date().toISOString() } });
+      await trackio.notificarPagamentoAprovado({
+        ...current,
+        cliente: { ...current.cliente, ...Object.fromEntries(Object.entries(clienteWebhook).filter(([, v]) => v)) },
+        pagoEm: transacao.paid_at || new Date().toISOString(),
+        pagamento: { ...current.pagamento, pixCode: transacao.pix?.code, pixUrl: pixUrlPublica(transacao.pix?.url) },
+      });
+    });
+
+    return res.sendStatus(200);
+  } catch (err) {
+    console.warn("Trackio/Frendz: falha ao processar webhook.", err.message);
     return res.sendStatus(503);
   }
 });
