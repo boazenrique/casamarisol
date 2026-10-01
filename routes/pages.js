@@ -40,4 +40,18 @@ router.get("/pagamento/:id", async (req, res, next) => {
   }
 });
 
+router.get("/pedido/:id/confirmado", async (req, res) => {
+  try {
+    const pedido = await orderStore.findById(req.params.id);
+    if (!pedido) return res.status(404).render("404", { loja: LOJA });
+    // So mostra a pagina de confirmacao com pagamento ja aprovado; um link
+    // visitado antes disso volta para a tela de pagamento (que redireciona
+    // pra ca sozinha assim que o Pix for confirmado).
+    if (pedido.status !== "pago") return res.redirect(`/pagamento/${encodeURIComponent(pedido.id)}`);
+    res.render("confirmado", { loja: LOJA, pedido });
+  } catch (_) {
+    res.status(503).send("Nao foi possivel consultar o pedido agora. Tente novamente em instantes.");
+  }
+});
+
 module.exports = router;

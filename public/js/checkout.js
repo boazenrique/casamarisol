@@ -106,11 +106,10 @@
   cep.addEventListener("blur", buscarCep);
   document.getElementById("uf").oninput = (event) => { event.target.value = event.target.value.replace(/[^a-z]/gi, "").toUpperCase().slice(0, 2); };
 
-  function paid(status) {
+  function paid(status, orderId) {
     if (status !== "pago") return;
-    const el = document.getElementById("status-pagamento");
-    el.innerHTML = '<i class="fa-solid fa-circle-check"></i> Pagamento confirmado! Estamos preparando seu pedido.';
-    el.className = "status-pagamento pago"; clearInterval(timer);
+    clearInterval(timer);
+    location.href = `/pedido/${encodeURIComponent(orderId)}/confirmado`;
   }
   function showPix(data) {
     document.getElementById("pix-pedido-id").textContent = data.id; document.getElementById("pix-qr-code").src = data.pagamento.qrCodeDataUrl;
@@ -118,9 +117,15 @@
     document.querySelector(".checkout-colunas").setAttribute("inert", "");
     document.getElementById("checkout-pix").hidden = false;
     document.body.style.overflow = "hidden";
-    timer = setInterval(async () => { try { const response = await fetch(`/api/pedidos/${encodeURIComponent(data.id)}/status`); if (response.ok) paid((await response.json()).status); } catch (_) {} }, 4000);
+    timer = setInterval(async () => { try { const response = await fetch(`/api/pedidos/${encodeURIComponent(data.id)}/status`); if (response.ok) paid((await response.json()).status, data.id); } catch (_) {} }, 4000);
   }
-  document.getElementById("btn-copiar-pix").onclick = async (event) => { const field = document.getElementById("pix-copia-cola"); try { await navigator.clipboard.writeText(field.value); } catch (_) { field.select(); document.execCommand("copy"); } event.currentTarget.textContent = "Copiado!"; setTimeout(() => event.currentTarget.textContent = "Copiar", 1800); };
+  document.getElementById("btn-copiar-pix").onclick = async (event) => {
+    const field = document.getElementById("pix-copia-cola");
+    try { await navigator.clipboard.writeText(field.value); } catch (_) { field.select(); document.execCommand("copy"); }
+    const btn = event.currentTarget;
+    btn.textContent = "Copiado!"; btn.classList.add("btn-copiado");
+    setTimeout(() => { btn.textContent = "Copiar"; btn.classList.remove("btn-copiado"); }, 1800);
+  };
   document.getElementById("form-checkout").onsubmit = async (event) => {
     event.preventDefault();
     if (!document.querySelector('.etapa[data-step="3"]').classList.contains("ativa")) return;

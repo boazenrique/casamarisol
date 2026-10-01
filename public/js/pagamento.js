@@ -1,16 +1,11 @@
 (function () {
   const pedido = window.__PEDIDO__;
-  const statusEl = document.getElementById("status-pagamento");
   let intervalo;
 
   function aplicarStatus(status) {
     if (status === "pago") {
-      statusEl.textContent = "✅ Pagamento confirmado! Seu pedido está sendo preparado.";
-      statusEl.classList.remove("pendente");
-      statusEl.classList.add("pago");
       clearInterval(intervalo);
-      const btnSimular = document.getElementById("btn-simular");
-      if (btnSimular) btnSimular.style.display = "none";
+      location.href = `/pedido/${encodeURIComponent(pedido.id)}/confirmado`;
     }
   }
 

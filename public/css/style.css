@@ -639,6 +639,7 @@ button { font-family: inherit; }
 .btn-primario:hover { background: var(--verde-escuro); }
 .btn-secundario { background: var(--azul); color: var(--branco); }
 .btn-secundario:hover { background: var(--azul-medio); }
+.btn-secundario.btn-copiado, .btn-secundario.btn-copiado:hover { background: var(--verde); }
 .btn-outline { background: var(--branco); color: var(--verde); border-color: var(--verde); }
 .btn-outline:hover { background: var(--verde-bg); }
 .btn-bloco { width: 100%; }
@@ -901,6 +902,20 @@ input:focus, select:focus { outline: none; border-color: var(--azul); }
 .status-pagamento.pendente { background: #fdf6e5; color: #6b5300; }
 .status-pagamento.pago { background: var(--verde-bg); color: var(--verde); }
 .passos-pix { text-align: left; font-size: 12.5px; color: var(--texto-suave); margin: 18px 0; line-height: 1.8; }
+
+.pagina-confirmacao { max-width: 560px; }
+.icone-sucesso { font-size: 56px; color: var(--verde); margin-bottom: 6px; }
+.pagina-confirmacao p { color: var(--texto-suave); font-size: 13.5px; }
+.itens-comprados { display: flex; flex-direction: column; gap: 10px; text-align: left; margin: 20px 0; }
+.item-comprado { display: flex; align-items: center; gap: 14px; border: 1px solid var(--cinza-borda); border-radius: var(--raio-sm); padding: 10px; }
+.item-comprado img { width: 72px; height: 72px; object-fit: contain; border: 1px solid var(--cinza-borda); border-radius: var(--raio-sm); flex-shrink: 0; }
+.item-comprado div { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.item-comprado strong { font-size: 13.5px; line-height: 1.35; }
+.item-comprado small { color: var(--texto-suave); font-size: 12px; }
+.aviso-rastreio-email { display: flex; align-items: flex-start; gap: 12px; text-align: left; background: var(--verde-bg); border: 1px solid #bfe9cf; border-radius: var(--raio-sm); padding: 14px; margin-bottom: 20px; font-size: 13px; }
+.aviso-rastreio-email i { color: var(--verde); font-size: 19px; margin-top: 2px; }
+.aviso-rastreio-email strong { display: block; color: var(--verde-escuro); margin-bottom: 3px; }
+.aviso-rastreio-email span { color: var(--texto-suave); }
 
 /* ================= Avaliações ================= */
 .secao-avaliacoes {
