@@ -1,5 +1,7 @@
 const express = require("express");
 const router = express.Router();
+const fs = require("fs");
+const path = require("path");
 const produtos = require("../lib/products");
 const orderStore = require("../lib/orderStore");
 
@@ -12,7 +14,12 @@ const LOJA = {
 router.get("/favicon.ico", (req, res) => res.redirect(302, "/images/logo.png"));
 
 router.get("/", (req, res) => {
-  res.render("index", { loja: LOJA, produtos: produtos.listar() });
+  const banners = ["banner01.png", "banner02.png"].map((nome) => {
+    const arquivo = fs.statSync(path.join(__dirname, "../public/images", nome));
+    return `/images/${nome}?v=${arquivo.mtimeMs}-${arquivo.size}`;
+  });
+  res.set("Cache-Control", "no-cache");
+  res.render("index", { loja: LOJA, produtos: produtos.listar(), banners });
 });
 
 router.get("/produto/:slug", (req, res) => {
