@@ -162,23 +162,6 @@ button { font-family: inherit; }
   border: 2px solid var(--branco);
 }
 
-.faixa-categorias {
-  background: var(--azul);
-  border-top: 1px solid rgba(255,255,255,.08);
-}
-
-.faixa-categorias .container {
-  display: flex;
-  gap: 26px;
-  font-size: 12.5px;
-  font-weight: 600;
-  padding: 9px 20px;
-  color: #c3cae2;
-  overflow-x: auto;
-  letter-spacing: .01em;
-}
-.faixa-categorias a:hover { color: var(--branco); }
-
 .banner-produtos {
   width: 100%;
   background: var(--branco);
@@ -188,14 +171,6 @@ button { font-family: inherit; }
   width: 100%;
   height: auto;
 }
-
-/* ================= Breadcrumb ================= */
-.breadcrumb {
-  font-size: 12.5px;
-  color: var(--texto-suave);
-  margin: 16px 0 14px;
-}
-.breadcrumb a:hover { color: var(--vermelho); text-decoration: underline; }
 
 /* ================= Home ================= */
 .carrossel-home {
