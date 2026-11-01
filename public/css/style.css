@@ -1080,6 +1080,14 @@ input:focus, select:focus { outline: none; border-color: var(--azul); }
 }
 
 /* ================= Produtos relacionados ================= */
+.garantia-produto { margin: 24px 0; }
+.garantia-produto img {
+  width: 100%;
+  max-width: 1024px;
+  height: auto;
+  margin: 0 auto;
+}
+
 .banner-produto { margin-top: 20px; }
 .banner-produto img {
   display: block;

@@ -509,5 +509,62 @@
       "/images/processador/117.webp",
       "/images/processador/118.webp"
     ]
+  },
+  {
+    "id": "KIT4-SOUSPLAT-REDONDO-39CM",
+    "slug": "kit4-jogo-americano-redondo-sousplat-mesa-posta-cozinha",
+    "nome": "Kit4 Jogo Americano Redondo Sousplat Mesa Posta Cozinha",
+    "marca": "Casa Marisol",
+    "categoria": ["Cozinha", "Mesa Posta"],
+    "precoDe": 78.9,
+    "precoPix": 38.9,
+    "estoque": 289,
+    "nota": 0,
+    "avaliacoes": 0,
+    "sku": "KIT4-SOUSPLAT-REDONDO-39CM",
+    "opcoes": [
+      {
+        "id": "cor",
+        "nome": "Cor",
+        "escolhas": [
+          { "id": "laranja", "label": "Laranja" },
+          { "id": "bege", "label": "Bege" },
+          { "id": "verde", "label": "Verde" },
+          { "id": "cinza", "label": "Cinza" },
+          { "id": "azul", "label": "Azul" }
+        ]
+      }
+    ],
+    "descricao": [
+      "A promoção é apenas hoje! Por favor, compre rapidamente. Absolutamente grande valor pelo dinheiro!",
+      "Kit4 Jogo Americano Unidade Mesa Posta Souplast Redondo Lugar Americano",
+      "Lindos e versáteis jogos americanos que darão um toque especial à sua mesa e decoração da sua casa. Ideal para acomodar pratos e louças ao servir as refeições. Ótimo para seu dia a dia, prático, de fácil limpeza e material resistente."
+    ],
+    "beneficios": [
+      "Diversas opções de cores para combinar com a sua mesa.",
+      "Elegância e praticidade em cada refeição, do dia a dia a ocasiões especiais.",
+      "Transforme momentos simples em memoráveis, adicionando um toque acolhedor."
+    ],
+    "especificacoes": [
+      { "chave": "Tamanho", "valor": "39 x 39 cm" },
+      { "chave": "Composição", "valor": "Polipropileno" },
+      { "chave": "Quantidade", "valor": "4 unidades" }
+    ],
+    "atencao": "Pode haver divergência na tonalidade do produto vista no site e a do produto ao vivo, devido ao modelo do monitor das telas de computadores e celulares.",
+    "garantia": "Garantia do vendedor: 7 dias.",
+    "imagens": [
+      "/images/Sousplats01/spm01.webp",
+      "/images/Sousplats01/spm02.webp",
+      "/images/Sousplats01/spm03.webp",
+      "/images/Sousplats01/spm04.jpg",
+      "/images/Sousplats01/spm05.webp",
+      "/images/Sousplats01/spm06.jpg",
+      "/images/Sousplats01/spm07.webp",
+      "/images/Sousplats01/spm08.avif",
+      "/images/Sousplats01/spm09.avif",
+      "/images/Sousplats01/spm10.avif",
+      "/images/Sousplats01/spm11.avif",
+      "/images/Sousplats01/spm12.avif"
+    ]
   }
 ]
