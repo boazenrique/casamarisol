@@ -566,5 +566,93 @@
       "/images/Sousplats01/spm11.avif",
       "/images/Sousplats01/spm12.avif"
     ]
+  },
+  {
+    "id": "KIT-TOALHAS-MICROFIBRA-70X140",
+    "slug": "kit-toalhas-banho-luxo-ultra-absorvente-gigante-70x140cm",
+    "nome": "Kit Toalhas De Banho de Luxo Ultra Absorvente, Gigante 70x140cm",
+    "marca": "Casa Marisol",
+    "categoria": [
+      "Casa",
+      "Banho"
+    ],
+    "precoDe": 52.9,
+    "precoPix": 39.9,
+    "rotuloVariacao": "Escolha seu kit",
+    "variacoes": [
+      {
+        "id": "kit-4",
+        "label": "Kit com 4 toalhas",
+        "precoDe": 52.9,
+        "precoPix": 39.9
+      },
+      {
+        "id": "kit-6",
+        "label": "Kit com 6 toalhas",
+        "precoDe": 82.9,
+        "precoPix": 59.9
+      }
+    ],
+    "estoque": 1,
+    "nota": 0,
+    "avaliacoes": 0,
+    "sku": "KIT-TOALHAS-MICROFIBRA-70X140",
+    "descricaoResumo": "Toalha de Banho em Microfibra 70?140cm ? 280g. Ideal para Praia, Piscina, Viagem e Uso Di?rio.",
+    "descricao": [
+      "Toalha de Banho em Microfibra 70?140cm ? 280g",
+      "Ideal para Praia, Piscina, Viagem e Uso Di?rio",
+      "?? Secagem R?pida de Verdade",
+      "Cansado de toalhas que ficam molhadas por horas e com cheiro ruim?",
+      "Nossa toalha de microfibra premium seca muito mais r?pido que toalhas comuns, evitando mofo e odores desagrad?veis.",
+      "?? Leve, mas Super Absorvente",
+      "Apesar de pesar apenas 280g, ela absorve a ?gua com efici?ncia, deixando sua pele seca em poucos segundos ? perfeita para praia, piscina, academia e viagens.",
+      "?? Macia e Confort?vel na Pele",
+      "N?o arranha, n?o irrita e n?o fica ?spera ap?s as lavagens. Ideal para adultos e crian?as, inclusive para peles sens?veis.",
+      "?? Compacta e F?cil de Transportar",
+      "Ocupa pouco espa?o na mochila ou mala. Chega de toalhas pesadas e volumosas!",
+      "?? Dur?vel e F?cil de Lavar",
+      "N?o solta fiapos, n?o desbota facilmente e mant?m a maciez mesmo ap?s v?rias lavagens.",
+      "? Por que escolher esta toalha?",
+      "? Seca r?pido",
+      "? Leve e compacta",
+      "? Super absorvente",
+      "? Confort?vel e macia",
+      "? ?timo custo-benef?cio",
+      "?? Pronta para envio imediato!",
+      "Garanta j? a sua e tenha mais praticidade e conforto no dia a dia ??"
+    ],
+    "especificacoes": [
+      {
+        "chave": "?? Tamanho",
+        "valor": "70 ? 140 cm"
+      },
+      {
+        "chave": "?? Peso",
+        "valor": "280g"
+      },
+      {
+        "chave": "?? Material",
+        "valor": "Microfibra de alta qualidade"
+      },
+      {
+        "chave": "?? Secagem",
+        "valor": "R?pida"
+      },
+      {
+        "chave": "??? Indicado para",
+        "valor": "Praia | Piscina | Banho | Viagem | Academia"
+      }
+    ],
+    "imagens": [
+      "/images/Toalha ultraabsorvente/br-11134201-820ma-mqyf2v920r9he2.webp",
+      "/images/Toalha ultraabsorvente/br-11134207-81ztc-mk9mxusbfi0wd5.webp",
+      "/images/Toalha ultraabsorvente/br-11134207-81ztc-mk9mxusm1khs62.webp",
+      "/images/Toalha ultraabsorvente/br-11134207-81ztc-mkjevv24ketcbe.webp",
+      "/images/Toalha ultraabsorvente/br-11134207-820l9-ml7viikeul1iac.webp",
+      "/images/Toalha ultraabsorvente/br-11134207-820ld-ml7viikfigp16e.webp",
+      "/images/Toalha ultraabsorvente/br-11134207-820lf-ml7viiket6h2d8.webp",
+      "/images/Toalha ultraabsorvente/br-11134207-820lt-ml7viikfzbif2d.jpg",
+      "/images/Toalha ultraabsorvente/br-11134207-820m3-ml7viikgdd6s6b.webp"
+    ]
   }
 ]
