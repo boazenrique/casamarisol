@@ -76,17 +76,17 @@
 
         <% if (produto.variacoes && produto.variacoes.length) { %>
           <div class="selecao-variacao">
-            <div class="rotulo-variacao">Capacidade</div>
+            <div class="rotulo-variacao"><%= produto.rotuloVariacao || "Capacidade" %></div>
             <div class="opcoes-variacao" id="opcoes-variacao">
               <% produto.variacoes.forEach(function(v, i) { %>
                 <button
                   type="button"
                   class="opcao-variacao <%= i === 0 ? 'ativa' : '' %>"
                   data-id="<%= v.id %>"
-                  data-capacidade="<%= v.capacidade %>"
+                  data-capacidade="<%= (v.label || v.capacidade) %>"
                   data-preco-pix="<%= v.precoPix %>"
                   data-preco-de="<%= v.precoDe %>"
-                ><%= v.capacidade %></button>
+                ><%= (v.label || v.capacidade) %><% if (produto.rotuloVariacao) { %><br /><small>De <s><%= v.precoDe.toLocaleString("pt-BR", {style:"currency", currency:"BRL"}) %></s> por <strong><%= v.precoPix.toLocaleString("pt-BR", {style:"currency", currency:"BRL"}) %></strong></small><% } %></button>
               <% }) %>
             </div>
           </div>

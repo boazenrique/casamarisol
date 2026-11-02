@@ -187,26 +187,42 @@
     const itensAvaliacao = Array.from(document.querySelectorAll(".avaliacao-item"));
     const semResultado = document.getElementById("sem-avaliacoes-filtro");
     const botoesFiltro = Array.from(filtroNotas.querySelectorAll(".filtro-nota"));
+    const btnVerComentarios = document.getElementById("btn-ver-comentarios");
     let notaAtiva = null;
+    let mostrarTodos = false;
 
     function aplicarFiltro() {
       let visiveis = 0;
       itensAvaliacao.forEach((item) => {
         const mostrar = notaAtiva === null || item.dataset.estrelas === String(notaAtiva);
-        item.style.display = mostrar ? "" : "none";
+        item.style.display = mostrar && (mostrarTodos || visiveis < 2) ? "" : "none";
         if (mostrar) visiveis++;
       });
       semResultado.classList.toggle("mostrar", visiveis === 0);
+      if (btnVerComentarios) {
+        btnVerComentarios.style.display = visiveis <= 2 ? "none" : "";
+        btnVerComentarios.setAttribute("aria-expanded", String(mostrarTodos));
+        btnVerComentarios.textContent = mostrarTodos ? "Ver menos comentários" : "Ver mais comentários";
+      }
+    }
+
+    if (btnVerComentarios) {
+      btnVerComentarios.addEventListener("click", () => {
+        mostrarTodos = !mostrarTodos;
+        aplicarFiltro();
+      });
     }
 
     botoesFiltro.forEach((botao) => {
       botao.addEventListener("click", () => {
         const nota = parseInt(botao.dataset.estrelas, 10);
         notaAtiva = notaAtiva === nota ? null : nota;
+        mostrarTodos = false;
         botoesFiltro.forEach((b) => b.classList.toggle("ativo", parseInt(b.dataset.estrelas, 10) === notaAtiva));
         aplicarFiltro();
       });
     });
+    aplicarFiltro();
   }
 
   /* ---------- Fotos de clientes (lightbox) ---------- */

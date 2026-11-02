@@ -37,8 +37,8 @@
   <% } %>
 
   <div class="lista-avaliacoes" id="lista-avaliacoes">
-    <% produto.avaliacoesLista.forEach(function(av) { %>
-      <div class="avaliacao-item" data-estrelas="<%= av.estrelas %>">
+    <% produto.avaliacoesLista.forEach(function(av, indice) { %>
+      <div class="avaliacao-item" data-estrelas="<%= av.estrelas %>"<%- indice >= 2 ? ' style="display: none"' : '' %>>
         <div class="cabecalho-avaliacao-item">
           <% if (av.foto) { %>
             <img class="avatar-avaliacao" src="<%= av.foto %>" alt="Foto de <%= av.nome %>" loading="lazy" />
@@ -59,6 +59,10 @@
       </div>
     <% }) %>
   </div>
+
+  <% if (produto.avaliacoesLista.length > 2) { %>
+    <button type="button" class="btn btn-outline" id="btn-ver-comentarios" aria-controls="lista-avaliacoes" aria-expanded="false" style="margin-top: 16px">Ver mais comentários</button>
+  <% } %>
 
   <p class="sem-avaliacoes-filtro" id="sem-avaliacoes-filtro">Nenhuma avaliação encontrada com essa nota.</p>
 
