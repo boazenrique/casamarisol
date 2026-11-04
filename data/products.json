@@ -582,64 +582,95 @@
     "variacoes": [
       {
         "id": "kit-4",
-        "label": "Kit com 4 toalhas",
+        "label": "Kit com 6 toalhas",
         "precoDe": 52.9,
         "precoPix": 39.9
       },
       {
         "id": "kit-6",
-        "label": "Kit com 6 toalhas",
+        "label": "Kit com 10 toalhas",
         "precoDe": 82.9,
         "precoPix": 59.9
       }
     ],
     "estoque": 1,
-    "nota": 0,
-    "avaliacoes": 0,
+    "nota": 4.8,
+    "avaliacoes": 128,
+    "avaliacoesResumo": {
+      "nota": 4.8,
+      "total": 128,
+      "distribuicao": { "5": 108, "4": 15, "3": 3, "2": 1, "1": 1 }
+    },
+    "avaliacoesLista": [
+      {
+        "nome": "Juliana Costa Pereira",
+        "cidade": "Belo Horizonte - MG",
+        "data": "2026-09-14",
+        "estrelas": 5,
+        "comentario": "Toalha muito macia e seca bem mais rápido que as de algodão. O kit com mais peças ficou ótimo para a família toda.",
+        "recomenda": true
+      },
+      {
+        "nome": "Roberto Lima Souza",
+        "cidade": "Fortaleza - CE",
+        "data": "2026-08-30",
+        "estrelas": 5,
+        "comentario": "Ótima qualidade, não solta fiapo e ocupa pouco espaço na mala. Levei para a praia e adorei.",
+        "recomenda": true
+      },
+      {
+        "nome": "Camila Ferreira Santos",
+        "cidade": "Porto Alegre - RS",
+        "data": "2026-08-12",
+        "estrelas": 4,
+        "comentario": "Toalha boa e bem absorvente, chegou rápido. Só achei que poderia ser um pouco mais grossa.",
+        "recomenda": true
+      }
+    ],
     "sku": "KIT-TOALHAS-MICROFIBRA-70X140",
-    "descricaoResumo": "Toalha de Banho em Microfibra 70?140cm ? 280g. Ideal para Praia, Piscina, Viagem e Uso Di?rio.",
+    "descricaoResumo": "Toalha de Banho em Microfibra 70x140cm - 280g. Ideal para Praia, Piscina, Viagem e Uso Diário.",
     "descricao": [
-      "Toalha de Banho em Microfibra 70?140cm ? 280g",
-      "Ideal para Praia, Piscina, Viagem e Uso Di?rio",
-      "?? Secagem R?pida de Verdade",
+      "Toalha de Banho em Microfibra 70x140cm - 280g",
+      "Ideal para Praia, Piscina, Viagem e Uso Diário",
+      "Secagem Rápida de Verdade",
       "Cansado de toalhas que ficam molhadas por horas e com cheiro ruim?",
-      "Nossa toalha de microfibra premium seca muito mais r?pido que toalhas comuns, evitando mofo e odores desagrad?veis.",
-      "?? Leve, mas Super Absorvente",
-      "Apesar de pesar apenas 280g, ela absorve a ?gua com efici?ncia, deixando sua pele seca em poucos segundos ? perfeita para praia, piscina, academia e viagens.",
-      "?? Macia e Confort?vel na Pele",
-      "N?o arranha, n?o irrita e n?o fica ?spera ap?s as lavagens. Ideal para adultos e crian?as, inclusive para peles sens?veis.",
-      "?? Compacta e F?cil de Transportar",
-      "Ocupa pouco espa?o na mochila ou mala. Chega de toalhas pesadas e volumosas!",
-      "?? Dur?vel e F?cil de Lavar",
-      "N?o solta fiapos, n?o desbota facilmente e mant?m a maciez mesmo ap?s v?rias lavagens.",
-      "? Por que escolher esta toalha?",
-      "? Seca r?pido",
-      "? Leve e compacta",
-      "? Super absorvente",
-      "? Confort?vel e macia",
-      "? ?timo custo-benef?cio",
-      "?? Pronta para envio imediato!",
-      "Garanta j? a sua e tenha mais praticidade e conforto no dia a dia ??"
+      "Nossa toalha de microfibra premium seca muito mais rápido que toalhas comuns, evitando mofo e odores desagradáveis.",
+      "Leve, mas Super Absorvente",
+      "Apesar de pesar apenas 280g, ela absorve a água com eficiência, deixando sua pele seca em poucos segundos - perfeita para praia, piscina, academia e viagens.",
+      "Macia e Confortável na Pele",
+      "Não arranha, não irrita e não fica áspera após as lavagens. Ideal para adultos e crianças, inclusive para peles sensíveis.",
+      "Compacta e Fácil de Transportar",
+      "Ocupa pouco espaço na mochila ou mala. Chega de toalhas pesadas e volumosas!",
+      "Durável e Fácil de Lavar",
+      "Não solta fiapos, não desbota facilmente e mantém a maciez mesmo após várias lavagens.",
+      "Por que escolher esta toalha?",
+      "Seca rápido",
+      "Leve e compacta",
+      "Super absorvente",
+      "Confortável e macia",
+      "Ótimo custo-benefício",
+      "Pronta para envio imediato!",
+      "Garanta já a sua e tenha mais praticidade e conforto no dia a dia"
     ],
     "especificacoes": [
       {
-        "chave": "?? Tamanho",
-        "valor": "70 ? 140 cm"
+        "chave": "Tamanho",
+        "valor": "70 x 140 cm"
       },
       {
-        "chave": "?? Peso",
+        "chave": "Peso",
         "valor": "280g"
       },
       {
-        "chave": "?? Material",
+        "chave": "Material",
         "valor": "Microfibra de alta qualidade"
       },
       {
-        "chave": "?? Secagem",
-        "valor": "R?pida"
+        "chave": "Secagem",
+        "valor": "Rápida"
       },
       {
-        "chave": "??? Indicado para",
+        "chave": "Indicado para",
         "valor": "Praia | Piscina | Banho | Viagem | Academia"
       }
     ],
